@@ -326,6 +326,40 @@ h1,h2,h3,.display{
 <body>
 <div id="app"></div>
 
+<!-- Red de seguridad: va en un bloque de código aparte a propósito. Si el
+     bloque principal tiene un error de sintaxis, no se ejecuta nada de él y la
+     página queda en blanco (parece que "el login no deja entrar"). Esto detecta
+     ese caso y lo muestra en pantalla en vez de dejarlo mudo. -->
+<script>
+window.APP_VERSION = '2026.09.03';
+window.addEventListener('error', function(ev){
+  var app = document.getElementById('app');
+  if(!app || app.innerHTML.trim() !== '') return;
+  app.innerHTML = '<div style="max-width:640px;margin:80px auto;padding:28px;font-family:system-ui,sans-serif;'
+    + 'border:1px solid #e5c7c7;border-radius:12px;background:#fff6f6;color:#7a1f1f;">'
+    + '<h2 style="margin:0 0 10px;">La aplicación no pudo cargar</h2>'
+    + '<p style="margin:0 0 10px;line-height:1.5;">Hay un error en el código de la página, así que el'
+    + ' formulario de ingreso nunca se dibujó. Esto <b>no</b> es un problema de tu usuario ni de tu contraseña.</p>'
+    + '<p style="margin:0 0 10px;line-height:1.5;">Reporta este detalle al equipo de sistemas:</p>'
+    + '<pre style="white-space:pre-wrap;background:#fff;padding:12px;border-radius:8px;border:1px solid #e5c7c7;'
+    + 'margin:0;font-size:12px;">' + String(ev.message) + '\nlínea ' + ev.lineno + ', columna ' + ev.colno + '</pre>'
+    + '<p style="margin:12px 0 0;font-size:12px;opacity:.8;">Versión cargada: ' + window.APP_VERSION + '</p>'
+    + '</div>';
+});
+// Si a los 3s el contenedor sigue vacío, es caché vieja o un bloqueo de carga.
+setTimeout(function(){
+  var app = document.getElementById('app');
+  if(app && app.innerHTML.trim() === ''){
+    app.innerHTML = '<div style="max-width:640px;margin:80px auto;padding:28px;font-family:system-ui,sans-serif;'
+      + 'border:1px solid #e0d7c2;border-radius:12px;background:#fffdf5;color:#6b5a2a;">'
+      + '<h2 style="margin:0 0 10px;">La aplicación no terminó de cargar</h2>'
+      + '<p style="margin:0;line-height:1.5;">Prueba recargar forzando la actualización de caché'
+      + ' (<b>Ctrl+F5</b>, o <b>Cmd+Shift+R</b> en Mac). Si sigue igual, avisa al equipo de sistemas.</p>'
+      + '</div>';
+  }
+}, 3000);
+</script>
+
 <script>
 /* ============================================================
    DATA / CONFIG
@@ -518,7 +552,13 @@ let pendingCaptura = null; // { dataUrl, fileName }
 async function loadRequisiciones(){
   state.loading = true;
   try{
-    const res = await fetch(APPS_SCRIPT_URL + '?action=list');
+    /* Con timeout: si Apps Script no responde, la promesa se corta en vez de
+       quedarse colgada esperando indefinidamente. */
+    const ctrl = new AbortController();
+    const timer = setTimeout(()=>ctrl.abort(), 15000);
+    let res;
+    try{ res = await fetch(APPS_SCRIPT_URL + '?action=list', {signal: ctrl.signal}); }
+    finally{ clearTimeout(timer); }
     const data = await res.json();
     state.requisiciones = Array.isArray(data) ? data : [];
   }catch(e){
@@ -588,7 +628,7 @@ function renderLogin(){
           </div>
         </div>
       </div>
-      <div class="foot-note">Sistema de Gestión Integrado — Formato Requisición de Personal, Versión 001</div>
+      <div class="foot-note">Sistema de Gestión Integrado — Formato Requisición de Personal, Versión 001 · build ${window.APP_VERSION || '—'}</div>
     </div>
 
     <div class="login-side form">
@@ -607,11 +647,13 @@ function renderLogin(){
         <form id="login-form">
           <div class="field">
             <label>Usuario</label>
-            <input type="text" id="login-user" autocomplete="username" placeholder="usuario">
+            <input type="text" id="login-user" autocomplete="username" placeholder="usuario"
+                   autocapitalize="none" autocorrect="off" spellcheck="false">
           </div>
           <div class="field">
             <label>Contraseña</label>
-            <input type="password" id="login-pass" autocomplete="current-password" placeholder="••••••••">
+            <input type="password" id="login-pass" autocomplete="current-password" placeholder="••••••••"
+                   autocapitalize="none" autocorrect="off" spellcheck="false">
           </div>
           <button type="submit" class="btn btn-primary">Ingresar como ${ROLE_LABEL[state.loginRole]}</button>
         </form>
@@ -638,18 +680,38 @@ function attachLoginEvents(){
   const form = document.getElementById('login-form');
   form.addEventListener('submit', async (e)=>{
     e.preventDefault();
-    const u = document.getElementById('login-user').value.trim().toLowerCase();
-    const p = document.getElementById('login-pass').value;
-    const found = USERS.find(x=>x.usuario===u && x.password===p && x.rol===state.loginRole);
-    if(!found){
-      state.loginError = 'Usuario, contraseña o rol incorrectos. Verifica e intenta de nuevo.';
+    /* El usuario se normaliza igual que se generó (slugify): así "Logis Fashion",
+       "LOGISFASHION" o " logisfashion " entran sin problema. La contraseña solo
+       se le quitan los espacios de los extremos (los que deja copiar/pegar y el
+       teclado del celular); el resto se compara tal cual. */
+    const u = slugify(document.getElementById('login-user').value);
+    const p = document.getElementById('login-pass').value.trim();
+
+    if(!u || !p){
+      state.loginError = 'Escribe tu usuario y tu contraseña.';
       render();
       return;
     }
+
+    /* Se busca por usuario + contraseña, sin exigir que la pestaña coincida:
+       si son correctas pero estabas en otra pestaña, se entra igual con el rol
+       real en vez de rechazar el ingreso. */
+    const found = USERS.find(x=>x.usuario===u && x.password===p);
+    if(!found){
+      const existe = USERS.some(x=>x.usuario===u);
+      state.loginError = existe
+        ? `La contraseña no coincide para el usuario “${u}”. Recuerda que es el mismo nombre seguido de 2026 y sin espacios.`
+        : `No existe el usuario “${u}”. Debe ser el nombre de tu operación en minúsculas, sin espacios ni tildes.`;
+      render();
+      return;
+    }
+
+    state.loginRole = found.rol; // ajusta la pestaña al rol real del usuario
+    state.view = 'dashboard';
     state.user = found;
     state.loginError = '';
-    state.view = 'dashboard';
-    await loadRequisiciones();
+    render();                  // entra de inmediato, sin esperar al servidor
+    await loadRequisiciones(); // y luego trae los datos
     render();
   });
 }
@@ -725,7 +787,15 @@ function attachShellEvents(){
     });
   });
   document.getElementById('logout-btn').addEventListener('click', ()=>{
-    state.user = null; render();
+    /* Limpia todo: si no, el siguiente usuario que entre en el mismo navegador
+       hereda la vista y los datos cargados por el anterior. */
+    state.user = null;
+    state.view = 'dashboard';
+    state.requisiciones = [];
+    state.loaded = false;
+    state.loginError = '';
+    pendingCaptura = null;
+    render();
   });
   attachMainEvents();
 }
@@ -791,7 +861,9 @@ function renderDashboard(){
       </div>`;
   }
 
-  const recent = [...all].sort((a,b)=> new Date(b.fechaSolicitud)-new Date(a.fechaSolicitud)).slice(0,5);
+  /* El coordinador solo ve su propia actividad; gerencia y RH ven todo. */
+  const visibles = role==='coordinador' ? mine : all;
+  const recent = [...visibles].sort((a,b)=> new Date(b.fechaSolicitud)-new Date(a.fechaSolicitud)).slice(0,5);
 
   return `
     <div class="page-head">
