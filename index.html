@@ -418,8 +418,25 @@ function buildCoordUsers(){
   });
 }
 
+/* Coordinadores con cuenta propia (nombre de persona en vez del nombre de la
+   operación). El usuario se escribe igual que el nombre, en minúsculas y sin
+   espacios ni tildes: "Felipe Coordinadores" -> "felipecoordinadores". */
+const COORD_EXTRA = [
+  {
+    usuario:'felipecoordinadores',
+    password:'2143658709',
+    nombre:'Felipe Coordinadores',
+    cargo:'Coordinador de Operación',
+    correo:'felipecoordinadores@inlotrans.com.co',
+    rol:'coordinador',
+    operacionCode:'GIRON',
+    operacionNombre:'Girón',
+  },
+];
+
 const USERS = [
   ...buildCoordUsers(),
+  ...COORD_EXTRA,
   {usuario:'gerencia', password:'gerencia2026', nombre:'Gerencia', cargo:'Gerente General', correo:'gerencia@inlotrans.com.co', rol:'gerencia'},
   {usuario:'rh', password:'rh2026', nombre:'Recursos Humanos', cargo:'Gestión Humana', correo:'rh@inlotrans.com.co', rol:'rh'},
 ];
