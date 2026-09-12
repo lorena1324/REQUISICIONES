@@ -536,6 +536,7 @@ const CARGOS = [
   'Analista Logístico',
   'Auxiliar de Calidad',
   'Certificador',
+  'OMT',
   'Montacarguista',
   'Auxiliar Logístico – Mujer',
   'Auxiliar Logístico – Hombre',
@@ -548,6 +549,10 @@ const CARGOS = [
    tomadas del documento oficial "Competencias por Cargo" de Inlotrans.
    Se usan para autocompletar el formulario de requisición según el cargo seleccionado. */
 const CARGO_COMPETENCIAS = {
+  'OMT': {
+    experiencia: 'Operador OMT con certificación vigente para la operación correspondiente y experiencia comprobable en manejo seguro de equipos y operación logística.',
+    aspectos: 'Certificación OMT vigente y verificable, cumplimiento de protocolos de seguridad, inspección preoperacional del equipo, manejo seguro de carga, atención a normas SST y experiencia en operación logística.'
+  },
   'Jefe de Operaciones': {
     experiencia: 'Profesional o Tecnólogo en áreas afines, con 2 a 3 años de experiencia en logística, manejo de personal superior a 75 personas, manejo y control de KPI y costos (homologable con experiencia).',
     aspectos: 'Habilidades en comunicación, toma de decisiones, servicio al cliente, análisis, resolución de conflictos, manejo de herramientas ofimáticas y orientación a resultados.'
@@ -1067,6 +1072,11 @@ function renderNuevaRequisicion(){
             <label>Aspectos relevantes del cargo <span style="font-weight:400; text-transform:none; color:var(--ink-faint);">(se llena automáticamente al elegir el cargo — puedes ajustarla)</span></label>
             <textarea id="f-aspectos" rows="2" placeholder="Selecciona un cargo para autocompletar los aspectos y habilidades relevantes…"></textarea>
           </div>
+          <div class="field span2" id="omt-cert-wrap" style="display:none;">
+            <label>Certificación OMT <span style="color:#b42318;">*</span></label>
+            <input type="text" id="f-certificacion-omt" placeholder="Ej.: Certificación OMT vigente — indicar entidad / fecha de vigencia">
+            <div class="hint">Para una requisición de OMT, este campo es obligatorio. Registra la certificación que debe acreditar la persona seleccionada.</div>
+          </div>
           <div class="field span2">
             <label>Motivo de la requisición</label>
             <select id="f-motivo" required>
@@ -1182,6 +1192,7 @@ function renderReqCard(r, gerenciaActions, rhActions){
       <div class="detail-item"><div class="l">Correo solicitante</div><div class="v small">${r.solicitanteCorreo}</div></div>
       <div class="detail-item wide"><div class="l">Experiencia requerida</div><div class="v small">${r.experiencia}</div></div>
       ${r.aspectos ? `<div class="detail-item wide"><div class="l">Aspectos relevantes del cargo</div><div class="v small">${r.aspectos}</div></div>` : ''}
+      ${r.certificacionOMT ? `<div class="detail-item wide"><div class="l">Certificación OMT requerida</div><div class="v small">${r.certificacionOMT}</div></div>` : ''}
       ${r.comentarioGerencia ? `<div class="detail-item wide"><div class="l">Comentario de gerencia</div><div class="v small">${r.comentarioGerencia}</div></div>` : ''}
       ${r.clienteSolicito ? `
       <div class="detail-item wide">
@@ -1315,6 +1326,21 @@ function attachMainEvents(){
           aspEl.value = '';
         }
       });
+
+      const updateOMTRequirement = ()=>{
+        const isOMT = cargoSelect.value === 'OMT';
+        const wrap = document.getElementById('omt-cert-wrap');
+        const cert = document.getElementById('f-certificacion-omt');
+        if(!wrap || !cert) return;
+        wrap.style.display = isOMT ? 'block' : 'none';
+        cert.required = isOMT;
+        if(isOMT && !cert.value){
+          cert.value = 'Certificación OMT vigente y verificable';
+        }
+        if(!isOMT) cert.value = '';
+      };
+      cargoSelect.addEventListener('change', updateOMTRequirement);
+      updateOMTRequirement();
     }
 
     const clienteCheckbox = document.getElementById('f-cliente-solicito');
@@ -1378,6 +1404,7 @@ function attachMainEvents(){
         experiencia: document.getElementById('f-experiencia').value.trim(),
         fechaIngreso: document.getElementById('f-fecha-ingreso').value,
         aspectos: document.getElementById('f-aspectos').value.trim(),
+        certificacionOMT: document.getElementById('f-certificacion-omt')?.value.trim() || '',
         motivo: document.getElementById('f-motivo').value,
         solicitanteUsuario: state.user.usuario,
         solicitanteNombre: state.user.nombre.replace(/^Coordinador — /,''),
