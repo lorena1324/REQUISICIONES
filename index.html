@@ -372,7 +372,7 @@ h1,h2,h3,.display{
      página queda en blanco (parece que "el login no deja entrar"). Esto detecta
      ese caso y lo muestra en pantalla en vez de dejarlo mudo. -->
 <script>
-window.APP_VERSION = '2026.09.12';
+window.APP_VERSION = '2026.09.13';
 window.addEventListener('error', function(ev){
   var app = document.getElementById('app');
   if(!app || app.innerHTML.trim() !== '') return;
@@ -637,6 +637,7 @@ const STATUS = {
   REJ:'Rechazada',
   PROC:'En Proceso de Búsqueda',
   DONE:'Vacante Cubierta',
+  ARCH:'Archivada',
 };
 
 /* ============================================================
@@ -854,6 +855,7 @@ function navItemsFor(role){
     {id:'dashboard', label:'Resumen'},
     {id:'pendientes', label:'Pendientes de aprobación'},
     {id:'historial', label:'Historial general'},
+    {id:'archivadas', label:'Eliminadas / Archivadas'},
   ];
   if(role==='seguridad') return [
     {id:'dashboard', label:'Resumen'},
@@ -945,12 +947,14 @@ function renderMain(){
   }
   if(role==='gerencia'){
     if(state.view==='pendientes') return renderListado(state.requisiciones.filter(r=>r.estado===STATUS.PEND), 'Pendientes de aprobación', 'Requisiciones esperando tu decisión.', true);
-    if(state.view==='historial') return renderListado(state.requisiciones, 'Historial general', 'Todas las requisiciones registradas en el sistema.');
+    if(state.view==='historial') return renderListado(state.requisiciones.filter(r=>r.estado!==STATUS.ARCH), 'Historial general', 'Todas las requisiciones activas y finalizadas del sistema.');
+    if(state.view==='archivadas') return renderListado(state.requisiciones.filter(r=>r.estado===STATUS.ARCH), 'Eliminadas / Archivadas', 'Requisiciones que Gerencia decidió retirar del historial operativo.');
   }
   if(role==='rh'){
     if(state.view==='iniciar') return renderListado(state.requisiciones.filter(r=>r.estado===STATUS.APPR), 'Para iniciar búsqueda', 'Requisiciones aprobadas por gerencia, listas para iniciar selección.', false, true);
     if(state.view==='proceso') return renderListado(state.requisiciones.filter(r=>r.estado===STATUS.PROC), 'En proceso de búsqueda', 'Vacantes que RH está gestionando actualmente.', false, true);
-    if(state.view==='historial') return renderListado(state.requisiciones, 'Historial general', 'Todas las requisiciones registradas en el sistema.');
+    if(state.view==='historial') return renderListado(state.requisiciones.filter(r=>r.estado!==STATUS.ARCH), 'Historial general', 'Todas las requisiciones activas y finalizadas del sistema.');
+    if(state.view==='archivadas') return renderListado(state.requisiciones.filter(r=>r.estado===STATUS.ARCH), 'Eliminadas / Archivadas', 'Requisiciones que Gerencia decidió retirar del historial operativo.');
   }
   if(role==='seguridad'){
     if(state.view==='nueva') return renderNuevaRequisicion();
@@ -965,7 +969,7 @@ function renderMain(){
 /* ---------- DASHBOARD ---------- */
 function renderDashboard(){
   const role = state.user.rol;
-  const all = state.requisiciones;
+  const all = state.requisiciones.filter(r=>r.estado!==STATUS.ARCH);
   const mine = all.filter(r=>r.solicitanteUsuario===state.user.usuario);
   const counts = {
     pend: all.filter(r=>r.estado===STATUS.PEND).length,
@@ -1174,12 +1178,20 @@ function pipelineFor(r){
 }
 
 function canDeleteRequisicion(r){
+  if(!state.user) return false;
+  // Gerencia puede retirar del historial operativo las requisiciones que ya decidió.
+  if(state.user.rol === 'gerencia'){
+    return r.estado === STATUS.APPR || r.estado === STATUS.REJ;
+  }
+  // Se conserva la regla anterior para coordinadores/Seguridad.
   const own = r.solicitanteUsuario === state.user.usuario;
   const allowedRole = state.user.rol === 'coordinador' || state.user.rol === 'seguridad';
-  /* No permitimos borrar una requisición que ya entró a gestión de RH.
-     Así se conserva la trazabilidad del proceso. */
   const editableState = r.estado === STATUS.PEND || r.estado === STATUS.REJ;
   return own && allowedRole && editableState;
+}
+
+function canArchiveRequisicion(r){
+  return !!state.user && state.user.rol === 'gerencia' && (r.estado === STATUS.APPR || r.estado === STATUS.REJ);
 }
 
 function renderReqCard(r, gerenciaActions, rhActions){
@@ -1233,6 +1245,11 @@ function renderReqCard(r, gerenciaActions, rhActions){
     ${canDeleteRequisicion(r) ? `
       <div class="req-actions" style="justify-content:flex-end;">
         <button class="btn btn-danger btn-sm delete-req-btn" data-id="${r.id}">🗑 Eliminar requisición</button>
+      </div>
+    ` : ''}
+    ${canArchiveRequisicion(r) ? `
+      <div class="req-actions" style="justify-content:flex-end;">
+        <button class="btn btn-danger btn-sm archive-req-btn" data-id="${r.id}">🗑 Eliminar de historial</button>
       </div>
     ` : ''}
   </div>`;
@@ -1470,6 +1487,39 @@ function attachMainEvents(){
   document.querySelectorAll('.close-vacancy-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>updateEstado(btn.dataset.id, STATUS.DONE, 'Vacante cubierta por RH'));
   });
+  document.querySelectorAll('.archive-req-btn').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const req = state.requisiciones.find(r=>String(r.id)===String(btn.dataset.id));
+      if(!req || !canArchiveRequisicion(req)) return;
+      const ref = req.consecutivo ? `REQ-${req.consecutivo}` : 'esta requisición';
+      if(!confirm(`¿Retirar ${ref} del historial operativo?\n\nLa requisición NO se borrará de Google Sheets: quedará archivada y podrá consultarse en “Eliminadas / Archivadas”.`)) return;
+      btn.disabled = true;
+      btn.textContent = 'Archivando…';
+      try{
+        const res = await apiUpdateEstado({
+          id:req.id,
+          estado:STATUS.ARCH,
+          comentarioGerencia:((req.comentarioGerencia || '') + (req.comentarioGerencia ? ' | ' : '') + 'Archivada por Gerencia el ' + todayISO()).trim(),
+          fecha:todayISO(),
+          accionTxt:'Requisición archivada por Gerencia',
+          usuario:state.user.nombre.replace(/^Coordinador — /,'')
+        });
+        if(res && res.ok){
+          showToast(`${ref} archivada correctamente.`);
+          await loadRequisiciones();
+          state.view='historial';
+          render();
+        }else{
+          showToast((res && res.message) || 'No se pudo archivar la requisición.', true);
+          btn.disabled=false; btn.textContent='🗑 Eliminar de historial';
+        }
+      }catch(err){
+        showToast('Error de conexión al archivar. Verifica el Apps Script.', true);
+        btn.disabled=false; btn.textContent='🗑 Eliminar de historial';
+      }
+    });
+  });
+
   document.querySelectorAll('.delete-req-btn').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
       const req = state.requisiciones.find(r=>String(r.id)===String(btn.dataset.id));
