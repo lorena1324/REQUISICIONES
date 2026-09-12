@@ -1322,7 +1322,7 @@ function attachMainEvents(){
   if(refreshBtn) refreshBtn.addEventListener('click', async ()=>{ await loadRequisiciones(); render(); });
 
   const securityReqBtn = document.getElementById('security-req-btn');
-  if(securityOmtBtn) securityOmtBtn.addEventListener('click', ()=>{ state.view='nueva'; render(); });
+  if(securityReqBtn) securityReqBtn.addEventListener('click', ()=>{ pendingCaptura = null; state.view='nueva'; render(); });
 
 
   const newBtn = document.getElementById('dash-new-btn');
@@ -1379,6 +1379,7 @@ function attachMainEvents(){
 
     form.addEventListener('submit', async (e)=>{
       e.preventDefault();
+      e.stopPropagation();
 
       const clienteCheckboxEl = document.getElementById('f-cliente-solicito');
       const clienteSolicito = clienteCheckboxEl ? clienteCheckboxEl.checked : false;
@@ -1428,9 +1429,10 @@ function attachMainEvents(){
         if(result && result.ok){
           pendingCaptura = null;
           showToast(`Requisición #${result.consecutivo} enviada a Gerencia.`);
-          await loadRequisiciones();
           state.view = 'mis';
           render();
+          // Actualiza el historial sin sacar al usuario de la plataforma.
+          loadRequisiciones().then(()=>{ if(state.user && state.view==='mis') render(); }).catch(()=>{});
         } else {
           showToast((result && result.message) ? result.message : 'No se pudo enviar la requisición. Verifica que el Apps Script esté actualizado.', true);
           submitBtn.disabled = false;
