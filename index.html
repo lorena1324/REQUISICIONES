@@ -1090,13 +1090,7 @@ function renderNuevaRequisicion(){
           <div class="field span2">
             <label>Aspectos relevantes del cargo <span style="font-weight:400;text-transform:none;color:var(--ink-faint);">(se llena automáticamente al elegir el cargo)</span></label>
             <textarea id="f-aspectos" rows="3">${esSeguridad ? compInicial.aspectos : ''}</textarea>
-          </div>
-          <div class="field span2" id="omt-cert-wrap" style="display:none;">
-            <label>Certificación OMT</label>
-            <input type="text" id="f-certificacion-omt" value="" placeholder="">
-            <div class="hint"></div>
-          </div>
-          <div class="field span2">
+          </div><div class="field span2">
             <label>Motivo de la requisición</label>
             <select id="f-motivo" required>
               <option value="">Selecciona un motivo…</option>
@@ -1305,7 +1299,7 @@ function renderSecurityIncidents(){
 }
 
 function renderSecurityHistory(){
-  const rows = state.requisiciones.slice().sort((a,b)=>new Date(b.fechaSolicitud)-new Date(a.fechaSolicitud)).slice(0,10);
+  const rows = state.requisiciones.filter(r=>r.solicitanteUsuario===state.user.usuario).slice().sort((a,b)=>new Date(b.fechaSolicitud)-new Date(a.fechaSolicitud)).slice(0,10);
   return `${securityPageHead('Historial de seguridad','Trazabilidad del sistema')}
     <div class="card"><h3>Actividad registrada</h3><div class="muted security-note">Consulta y seguimiento de requisiciones solicitadas por Seguridad.</div>
       ${rows.length ? rows.map(r=>`<div class="security-history-row"><div><b>${r.cargo || 'Requisición'}</b><span>${r.operacionNombre || r.operacion || 'Operación'} · ${fmtDate(r.fechaSolicitud)}</span></div><span class="status-pill">${r.estado || 'Registrada'}</span></div>`).join('') : emptyState('Aún no hay registros disponibles.')}
@@ -1352,21 +1346,6 @@ function attachMainEvents(){
           aspEl.value = '';
         }
       });
-
-      const updateOMTRequirement = ()=>{
-        const isOMT = cargoSelect.value === 'OMT';
-        const wrap = document.getElementById('omt-cert-wrap');
-        const cert = document.getElementById('f-certificacion-omt');
-        if(!wrap || !cert) return;
-        wrap.style.display = isOMT ? 'block' : 'none';
-        cert.required = isOMT;
-        if(isOMT && !cert.value){
-          cert.value = 'Certificación OMT vigente y verificable';
-        }
-        if(!isOMT) cert.value = '';
-      };
-      cargoSelect.addEventListener('change', updateOMTRequirement);
-      updateOMTRequirement();
     }
 
     const clienteCheckbox = document.getElementById('f-cliente-solicito');
@@ -1453,12 +1432,12 @@ function attachMainEvents(){
           state.view = 'mis';
           render();
         } else {
-          showToast('No se pudo enviar la requisición. Intenta de nuevo.', true);
+          showToast((result && result.message) ? result.message : 'No se pudo enviar la requisición. Verifica que el Apps Script esté actualizado.', true);
           submitBtn.disabled = false;
           submitBtn.textContent = 'Enviar a Gerencia';
         }
       }catch(err){
-        showToast('Error de conexión al enviar la requisición.', true);
+        showToast('Error de conexión al enviar la requisición. Verifica la URL del Apps Script y los permisos de acceso.', true);
         submitBtn.disabled = false;
         submitBtn.textContent = 'Enviar a Gerencia';
       }
