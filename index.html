@@ -372,7 +372,7 @@ h1,h2,h3,.display{
      página queda en blanco (parece que "el login no deja entrar"). Esto detecta
      ese caso y lo muestra en pantalla en vez de dejarlo mudo. -->
 <script>
-window.APP_VERSION = '2026.09.03';
+window.APP_VERSION = '2026.09.12';
 window.addEventListener('error', function(ev){
   var app = document.getElementById('app');
   if(!app || app.innerHTML.trim() !== '') return;
@@ -551,6 +551,10 @@ const CARGOS = [
    tomadas del documento oficial "Competencias por Cargo" de Inlotrans.
    Se usan para autocompletar el formulario de requisición según el cargo seleccionado. */
 const CARGO_COMPETENCIAS = {
+  'OMT – Mujer': {
+    experiencia: 'Personal OMT – Mujer con certificación OMT vigente y verificable, experiencia comprobable en operación logística y seguridad. Debe cumplir los protocolos de seguridad, realizar inspección preoperacional y atender las normas SST de la operación.',
+    aspectos: 'Certificación OMT vigente y verificable obligatoria; experiencia en operación logística y seguridad; cumplimiento de protocolos de seguridad; atención al detalle; inspección preoperacional; cumplimiento de normas SST; manejo seguro de equipos y carga; disponibilidad para laborar en la operación asignada.'
+  },
   'AUXILIAR DE PREVENCION DE PERDIDAS': {
     experiencia: 'Operador SEGURIDAD con certificación vigente para la operación correspondiente y experiencia comprobable en manejo seguro de equipos y operación logística.',
     aspectos: 'Certificación SEGURIDAD vigente y verificable, cumplimiento de protocolos de seguridad, inspección preoperacional del equipo, manejo seguro de carga, atención a normas SST y experiencia en operación logística.'
@@ -1287,7 +1291,7 @@ function renderSecurityReports(){
         <div class="security-report-item"><div><b>Reporte de novedades</b><span>Consolidado de novedades e incidentes de seguridad.</span></div><button class="btn btn-ghost btn-sm" data-security-action="novedades">Consultar</button></div>
         <div class="security-report-item"><div><b>Reporte de trazabilidad</b><span>Histórico de actividad disponible en el sistema.</span></div><button class="btn btn-ghost btn-sm" data-security-action="trazabilidad">Consultar</button></div>
       </div>
-      <div class="card security-highlight"><div class="security-icon">📊</div><h3>Centro de control</h3><p>Este módulo queda separado del flujo de requisiciones. Los accesos de Seguridad no pueden crear ni aprobar requisiciones.</p></div>
+      <div class="card security-highlight"><div class="security-icon">📊</div><h3>Centro de control</h3><p>Este módulo queda separado de la aprobación. Seguridad puede crear requisiciones para el perfil OMT – Mujer y enviarlas a Gerencia para aprobación.</p></div>
     </div>`;
 }
 
