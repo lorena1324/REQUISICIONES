@@ -551,10 +551,6 @@ const CARGOS = [
    tomadas del documento oficial "Competencias por Cargo" de Inlotrans.
    Se usan para autocompletar el formulario de requisición según el cargo seleccionado. */
 const CARGO_COMPETENCIAS = {
-  'OMT – Mujer': {
-    experiencia: 'Personal OMT – Mujer con certificación OMT vigente y verificable, experiencia comprobable en operación logística y seguridad. Debe cumplir los protocolos de seguridad, realizar inspección preoperacional y atender las normas SST de la operación.',
-    aspectos: 'Certificación OMT vigente y verificable obligatoria; experiencia en operación logística y seguridad; cumplimiento de protocolos de seguridad; atención al detalle; inspección preoperacional; cumplimiento de normas SST; manejo seguro de equipos y carga; disponibilidad para laborar en la operación asignada.'
-  },
   'AUXILIAR DE PREVENCION DE PERDIDAS': {
     experiencia: 'Operador SEGURIDAD con certificación vigente para la operación correspondiente y experiencia comprobable en manejo seguro de equipos y operación logística.',
     aspectos: 'Certificación SEGURIDAD vigente y verificable, cumplimiento de protocolos de seguridad, inspección preoperacional del equipo, manejo seguro de carga, atención a normas SST y experiencia en operación logística.'
@@ -1053,11 +1049,11 @@ function reqSummaryRow(r){
 /* ---------- NUEVA REQUISICIÓN (Coordinador) ---------- */
 function renderNuevaRequisicion(){
   const esSeguridad = state.user.rol === 'seguridad';
-  const cargoInicial = esSeguridad ? 'OMT – Mujer' : '';
-  const compInicial = CARGO_COMPETENCIAS[cargoInicial];
+  const cargoInicial = esSeguridad ? 'AUXILIAR DE PREVENCION DE PERDIDAS' : '';
+  const compInicial = CARGO_COMPETENCIAS[cargoInicial] || {experiencia:'', aspectos:''};
   return `
     <div class="page-head">
-      <div><h1>Nueva requisición</h1><div class="sub">${esSeguridad ? 'Solicitud de personal para Seguridad · el perfil OMT – Mujer se completa automáticamente.' : 'Completa el formato — se enviará automáticamente a Gerencia para aprobación.'}</div></div>
+      <div><h1>Nueva requisición</h1><div class="sub">${esSeguridad ? 'Solicitud de personal para Seguridad · el perfil AUXILIAR DE PREVENCION DE PERDIDAS se completa automáticamente.' : 'Completa el formato — se enviará automáticamente a Gerencia para aprobación.'}</div></div>
     </div>
     <form id="nueva-req-form">
       <div class="card">
@@ -1077,7 +1073,7 @@ function renderNuevaRequisicion(){
           </div>
           <div class="field">
             <label>Cargo requerido</label>
-            ${esSeguridad ? `<div class="readonly-field" style="font-weight:700;color:var(--ink);">OMT – Mujer</div><input type="hidden" id="f-cargo" value="OMT – Mujer">` : `<select id="f-cargo" required><option value="">Selecciona un cargo…</option>${CARGOS.map(c=>`<option value="${c}">${c}</option>`).join('')}</select>`}
+            ${esSeguridad ? `<div class="readonly-field" style="font-weight:700;color:var(--ink);">AUXILIAR DE PREVENCION DE PERDIDAS</div><input type="hidden" id="f-cargo" value="AUXILIAR DE PREVENCION DE PERDIDAS">` : `<select id="f-cargo" required><option value="">Selecciona un cargo…</option>${CARGOS.map(c=>`<option value="${c}">${c}</option>`).join('')}</select>`}
           </div>
           <div class="field">
             <label>N° de vacantes</label>
@@ -1095,10 +1091,10 @@ function renderNuevaRequisicion(){
             <label>Aspectos relevantes del cargo <span style="font-weight:400;text-transform:none;color:var(--ink-faint);">(se llena automáticamente al elegir el cargo)</span></label>
             <textarea id="f-aspectos" rows="3">${esSeguridad ? compInicial.aspectos : ''}</textarea>
           </div>
-          <div class="field span2" id="omt-cert-wrap" style="display:${esSeguridad ? 'block' : 'none'};">
-            <label>Certificación OMT <span style="color:#b42318;">*</span></label>
-            <input type="text" id="f-certificacion-omt" value="${esSeguridad ? 'Certificación OMT vigente y verificable — obligatoria' : ''}" placeholder="Certificación OMT vigente y verificable">
-            <div class="hint">Para OMT es obligatorio acreditar certificación vigente y verificable.</div>
+          <div class="field span2" id="omt-cert-wrap" style="display:none;">
+            <label>Certificación OMT</label>
+            <input type="text" id="f-certificacion-omt" value="" placeholder="">
+            <div class="hint"></div>
           </div>
           <div class="field span2">
             <label>Motivo de la requisición</label>
@@ -1267,7 +1263,7 @@ function renderSecurityDashboard(stats){
         <div class="security-icon">🛡</div>
         <h3>Control de seguridad</h3>
         <p>Panel independiente para centralizar seguimiento, novedades, incidentes y controles de seguridad de INLOTRANS.</p>
-         <div style="margin-top:18px; display:flex; gap:10px; flex-wrap:wrap;"><button class="btn btn-primary" id="security-omt-btn" style="width:auto;">+ Nueva requisición</button><span class="hint" style="align-self:center;">Para Seguridad, el cargo se completa automáticamente como OMT – Mujer.</span></div>
+         <div style="margin-top:18px; display:flex; gap:10px; flex-wrap:wrap;"><button class="btn btn-primary" id="security-req-btn" style="width:auto;">+ Nueva requisición</button><span class="hint" style="align-self:center;">Para Seguridad, el cargo se completa automáticamente como AUXILIAR DE PREVENCION DE PERDIDAS.</span></div>
         <div class="security-list">
           <div><span>✓</span> Monitoreo de operaciones</div>
           <div><span>✓</span> Seguimiento de novedades</div>
@@ -1291,7 +1287,7 @@ function renderSecurityReports(){
         <div class="security-report-item"><div><b>Reporte de novedades</b><span>Consolidado de novedades e incidentes de seguridad.</span></div><button class="btn btn-ghost btn-sm" data-security-action="novedades">Consultar</button></div>
         <div class="security-report-item"><div><b>Reporte de trazabilidad</b><span>Histórico de actividad disponible en el sistema.</span></div><button class="btn btn-ghost btn-sm" data-security-action="trazabilidad">Consultar</button></div>
       </div>
-      <div class="card security-highlight"><div class="security-icon">📊</div><h3>Centro de control</h3><p>Este módulo queda separado de la aprobación. Seguridad puede crear requisiciones para el perfil OMT – Mujer y enviarlas a Gerencia para aprobación.</p></div>
+      <div class="card security-highlight"><div class="security-icon">📊</div><h3>Centro de control</h3><p>Este módulo queda separado de la aprobación. Seguridad puede crear requisiciones para el perfil AUXILIAR DE PREVENCION DE PERDIDAS y enviarlas a Gerencia para aprobación.</p></div>
     </div>`;
 }
 
@@ -1331,7 +1327,7 @@ function attachMainEvents(){
   const refreshBtn = document.getElementById('refresh-btn');
   if(refreshBtn) refreshBtn.addEventListener('click', async ()=>{ await loadRequisiciones(); render(); });
 
-  const securityOmtBtn = document.getElementById('security-omt-btn');
+  const securityReqBtn = document.getElementById('security-req-btn');
   if(securityOmtBtn) securityOmtBtn.addEventListener('click', ()=>{ state.view='nueva'; render(); });
 
 
@@ -1358,7 +1354,7 @@ function attachMainEvents(){
       });
 
       const updateOMTRequirement = ()=>{
-        const isOMT = cargoSelect.value === 'OMT' || cargoSelect.value === 'OMT – Mujer';
+        const isOMT = cargoSelect.value === 'OMT';
         const wrap = document.getElementById('omt-cert-wrap');
         const cert = document.getElementById('f-certificacion-omt');
         if(!wrap || !cert) return;
@@ -1429,12 +1425,12 @@ function attachMainEvents(){
         operacionCode: state.user.operacionCode,
         operacionNombre: state.user.operacionNombre,
         ciudad: document.getElementById('f-ciudad').value,
-        cargo: state.user.rol==='seguridad' ? 'OMT – Mujer' : document.getElementById('f-cargo').value,
+        cargo: state.user.rol==='seguridad' ? 'AUXILIAR DE PREVENCION DE PERDIDAS' : document.getElementById('f-cargo').value,
         vacantes: parseInt(document.getElementById('f-vacantes').value || '1'),
         experiencia: document.getElementById('f-experiencia').value.trim(),
         fechaIngreso: document.getElementById('f-fecha-ingreso').value,
         aspectos: document.getElementById('f-aspectos').value.trim(),
-        certificacionOMT: document.getElementById('f-certificacion-omt')?.value.trim() || '',
+        certificacionOMT: '',
         motivo: document.getElementById('f-motivo').value,
         solicitanteUsuario: state.user.usuario,
         solicitanteNombre: state.user.nombre.replace(/^Coordinador — /,''),
