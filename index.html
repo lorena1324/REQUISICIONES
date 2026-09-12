@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>INLOTRANS · Requisición de Personal</title>
+<title>INLOTRANS · Portal Operativo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
@@ -118,9 +118,9 @@ h1,h2,h3,.display{
 .login-card{width:100%;max-width:380px;}
 .login-card h2{font-size:15px;color:var(--ink-soft);font-weight:500;letter-spacing:.08em;}
 .login-card h1{font-size:28px;color:var(--ink);margin-top:6px;font-weight:600;}
-.role-tabs{display:flex;gap:8px;margin:26px 0 22px;}
+.role-tabs{display:flex;gap:7px;margin:26px 0 22px;flex-wrap:wrap;}
 .role-tab{
-  flex:1; text-align:center; padding:12px 6px; border-radius:8px;
+  flex:1 1 100px; text-align:center; padding:12px 6px; border-radius:8px;
   border:1.5px solid var(--line); background:#FAFBFC; cursor:pointer;
   font-size:12px; font-weight:700; letter-spacing:.03em; color:var(--ink-soft);
   text-transform:uppercase; font-family:'Inter'; transition:.15s;
@@ -321,6 +321,46 @@ h1,h2,h3,.display{
   .req-details{grid-template-columns:1fr 1fr;}
   .detail-item.wide{grid-column:span 2;}
 }
+
+/* ============================================================
+   SECURITY MODULE STYLES
+   ============================================================ */
+.security-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;margin-top:18px;}
+.security-card{position:relative;overflow:hidden;}
+.security-card:after{content:'SECURITY';position:absolute;right:-10px;bottom:-22px;font-family:'Oswald';font-size:80px;font-weight:700;color:rgba(11,18,32,.035);letter-spacing:.04em;}
+.security-icon{width:44px;height:44px;border-radius:12px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:21px;margin-bottom:16px;}
+.security-card h3,.security-highlight h3{font-size:18px;margin:0 0 8px;}
+.security-card p,.security-highlight p{color:var(--ink-soft);font-size:13px;line-height:1.65;max-width:650px;}
+.security-list{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px;}
+.security-list div{background:#F8F9FB;border:1px solid var(--line);padding:12px;border-radius:8px;font-size:12px;color:var(--ink-soft);font-weight:600;}
+.security-list span{color:var(--success);margin-right:7px;}
+.security-ops{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:15px;max-height:340px;overflow:auto;}
+.security-op{display:flex;align-items:center;gap:9px;border:1px solid var(--line);padding:10px;border-radius:8px;background:#FAFBFC;}
+.security-op b{display:block;font-size:12px;color:var(--ink);}
+.security-op small{display:block;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:9px;margin-top:3px;}
+.op-dot{width:8px;height:8px;border-radius:50%;background:var(--success);flex:0 0 auto;box-shadow:0 0 0 3px var(--success-bg);}
+.security-report-item{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:16px 0;border-bottom:1px solid var(--line);}
+.security-report-item:last-child{border-bottom:0;}
+.security-report-item b{display:block;font-size:13px;margin-bottom:4px;}
+.security-report-item span{display:block;color:var(--ink-soft);font-size:11.5px;}
+.security-highlight{background:linear-gradient(145deg,#F8F9FB,#fff);}
+.incident-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px;}
+.incident-type{border:1px solid var(--line);border-radius:10px;padding:16px;background:#FAFBFC;}
+.incident-type span{font-size:22px;display:block;margin-bottom:10px;}
+.incident-type b{display:block;font-size:13px;}
+.incident-type small{display:block;color:var(--ink-soft);font-size:11px;line-height:1.5;margin-top:5px;}
+.security-empty{text-align:center;border:1px dashed #CBD1DB;border-radius:10px;padding:35px 20px;margin-top:18px;background:#FAFBFC;}
+.security-empty-icon{font-size:28px;margin-bottom:8px;}
+.security-empty b{display:block;font-size:14px;}
+.security-empty span{display:block;color:var(--ink-soft);font-size:11.5px;margin-top:6px;}
+.security-note{margin-bottom:10px;}
+.security-history-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--line);gap:15px;}
+.security-history-row:last-child{border-bottom:0;}
+.security-history-row b{display:block;font-size:12.5px;}
+.security-history-row span:not(.status-pill){display:block;color:var(--ink-soft);font-size:11px;margin-top:4px;}
+.status-pill{padding:5px 9px;border-radius:20px;background:var(--info-bg);color:var(--info);font-size:10px;font-weight:700;white-space:nowrap;}
+@media(max-width:900px){.security-grid{grid-template-columns:1fr}.incident-grid{grid-template-columns:1fr}.security-list{grid-template-columns:1fr}.security-ops{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -466,10 +506,10 @@ const COORD_EXTRA = [
   {
     usuario:'seguridad',
     password:'seguridad2026*',
-    nombre:'administrativos — inlotrans',
-    cargo:'Coordinador de seguridad',
+    nombre:'Seguridad INLOTRANS',
+    cargo:'Coordinador de Seguridad',
     correo:'seguridad@inlotrans.com.co',
-    rol:'coordinador',
+    rol:'seguridad',
     operacionCode:'INL',
     operacionNombre:'SEGURIDAD',
   },
@@ -482,7 +522,7 @@ const USERS = [
   {usuario:'rh', password:'rh2026', nombre:'Recursos Humanos', cargo:'Gestión Humana', correo:'rh@inlotrans.com.co', rol:'rh'},
 ];
 
-const ROLE_LABEL = {coordinador:'Coordinador', gerencia:'Gerencia', rh:'Recursos Humanos'};
+const ROLE_LABEL = {coordinador:'Coordinador', gerencia:'Gerencia', rh:'Recursos Humanos', seguridad:'Seguridad'};
 
 /* Catálogo de cargos, alineado con el documento de Competencias por Cargo. */
 const CARGOS = [
@@ -673,7 +713,7 @@ function renderLogin(){
           <div class="brand-chip"><img src="${LOGO_ICON}" alt="Inlotrans"></div>
           <div>
             <div class="brand-name">INLOTRANS S.A.S.</div>
-            <div class="brand-sub">Gestión Humana · SIG-F-GH-014</div>
+            <div class="brand-sub">Portal Operativo · Gestión y Seguridad</div>
           </div>
         </div>
         <div class="pipeline-hero">
@@ -698,6 +738,7 @@ function renderLogin(){
           <div class="role-tab ${state.loginRole==='coordinador'?'active':''}" data-role="coordinador">Coordinador</div>
           <div class="role-tab ${state.loginRole==='gerencia'?'active':''}" data-role="gerencia">Gerencia</div>
           <div class="role-tab ${state.loginRole==='rh'?'active':''}" data-role="rh">Rec. Humanos</div>
+          <div class="role-tab ${state.loginRole==='seguridad'?'active':''}" data-role="seguridad">Seguridad</div>
         </div>
 
         ${state.loginError ? `<div class="err-msg">${state.loginError}</div>` : ''}
@@ -721,7 +762,13 @@ function renderLogin(){
           <b>Acceso por operación</b><br>
           Usuario → nombre de tu operación en minúsculas y sin espacios/tildes (ej. <b>operacion</b>)<br>
           Contraseña → ese mismo texto seguido de 2026 (ej. <b>operacion2026</b>)<br>
-          <span style="display:block;margin-top:6px;">Si no conoces el usuario exacto de tu operación, pídelo a el equipo de sistemas.</span>
+          <span style="display:block;margin-top:6px;">Si no conoces el usuario exacto de tu operación, pídelo al equipo de sistemas.</span>
+        </div>` : state.loginRole==='seguridad' ? `
+        <div class="demo-creds">
+          <b>Acceso Seguridad INLOTRANS</b><br>
+          Usuario → <b>seguridad</b><br>
+          Contraseña → <b>seguridad2026*</b><br>
+          <span style="display:block;margin-top:6px;">Este acceso entra únicamente al panel independiente de Seguridad.</span>
         </div>` : `
         <div class="demo-creds">
           Usa el usuario y contraseña que te asignó Gerencia / Recursos Humanos.
@@ -788,6 +835,12 @@ function navItemsFor(role){
     {id:'pendientes', label:'Pendientes de aprobación'},
     {id:'historial', label:'Historial general'},
   ];
+  if(role==='seguridad') return [
+    {id:'dashboard', label:'Resumen de seguridad'},
+    {id:'reportes', label:'Reportes de seguridad'},
+    {id:'novedades', label:'Novedades / incidentes'},
+    {id:'historial', label:'Historial de seguridad'},
+  ];
   return [
     {id:'dashboard', label:'Resumen'},
     {id:'iniciar', label:'Para iniciar búsqueda'},
@@ -808,7 +861,7 @@ function renderShell(){
           <div class="brand-chip"><img src="${LOGO_ICON}" alt="Inlotrans"></div>
           <div>
             <div class="brand-name" style="font-size:15px;">INLOTRANS</div>
-            <div class="brand-sub" style="font-size:9.5px;">Requisición de personal</div>
+            <div class="brand-sub" style="font-size:9.5px;">${role==='seguridad' ? 'Centro de Seguridad' : 'Requisición de personal'}</div>
           </div>
         </div>
         <div class="nav-section">Navegación</div>
@@ -877,6 +930,11 @@ function renderMain(){
     if(state.view==='proceso') return renderListado(state.requisiciones.filter(r=>r.estado===STATUS.PROC), 'En proceso de búsqueda', 'Vacantes que RH está gestionando actualmente.', false, true);
     if(state.view==='historial') return renderListado(state.requisiciones, 'Historial general', 'Todas las requisiciones registradas en el sistema.');
   }
+  if(role==='seguridad'){
+    if(state.view==='reportes') return renderSecurityReports();
+    if(state.view==='novedades') return renderSecurityIncidents();
+    if(state.view==='historial') return renderSecurityHistory();
+  }
   return renderDashboard();
 }
 
@@ -901,6 +959,17 @@ function renderDashboard(){
         <div class="stat-card"><div class="n">${mine.filter(r=>r.estado===STATUS.PROC||r.estado===STATUS.APPR).length}</div><div class="l">En búsqueda por RH</div></div>
         <div class="stat-card"><div class="n">${mine.filter(r=>r.estado===STATUS.DONE).length}</div><div class="l">Vacantes cubiertas</div></div>
       </div>`;
+  } else if(role==='seguridad'){
+    const securityOps = OPERACIONES.filter(o=>o.name !== 'Seguridad').length;
+    const totalReq = all.length;
+    const activeReq = counts.pend + counts.appr + counts.proc;
+    stats = `
+      <div class="stat-row">
+        <div class="stat-card accent"><div class="n">${securityOps}</div><div class="l">Operaciones monitoreadas</div></div>
+        <div class="stat-card"><div class="n">${activeReq}</div><div class="l">Procesos activos</div></div>
+        <div class="stat-card"><div class="n">${totalReq}</div><div class="l">Registros del sistema</div></div>
+        <div class="stat-card"><div class="n">${counts.done}</div><div class="l">Procesos cerrados</div></div>
+      </div>`;
   } else if(role==='gerencia'){
     stats = `
       <div class="stat-row">
@@ -922,6 +991,8 @@ function renderDashboard(){
   /* El coordinador solo ve su propia actividad; gerencia y RH ven todo. */
   const visibles = role==='coordinador' ? mine : all;
   const recent = [...visibles].sort((a,b)=> new Date(b.fechaSolicitud)-new Date(a.fechaSolicitud)).slice(0,5);
+
+  if(role==='seguridad') return renderSecurityDashboard(stats);
 
   return `
     <div class="page-head">
@@ -1143,9 +1214,83 @@ function renderReqCard(r, gerenciaActions, rhActions){
 }
 
 /* ============================================================
+   SECURITY MODULE
+   ============================================================ */
+function securityPageHead(title, sub){
+  return `<div class="page-head">
+    <div><h1>${title}</h1><div class="sub">Seguridad INLOTRANS · ${sub || todayLabel()}</div></div>
+    <div class="page-head-actions"><button class="btn btn-ghost btn-sm" id="refresh-btn">${state.loading ? '<span class="spin"></span>' : '↻'} Actualizar</button></div>
+  </div>`;
+}
+
+function renderSecurityDashboard(stats){
+  const ops = OPERACIONES.filter(o=>o.name !== 'Seguridad');
+  return `${securityPageHead('Panel de Seguridad','Control operativo y seguimiento')}
+    ${stats}
+    <div class="security-grid">
+      <div class="card security-card">
+        <div class="security-icon">🛡</div>
+        <h3>Control de seguridad</h3>
+        <p>Panel independiente para centralizar seguimiento, novedades, incidentes y controles de seguridad de INLOTRANS.</p>
+        <div class="security-list">
+          <div><span>✓</span> Monitoreo de operaciones</div>
+          <div><span>✓</span> Seguimiento de novedades</div>
+          <div><span>✓</span> Registro de incidentes</div>
+          <div><span>✓</span> Trazabilidad histórica</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-head"><div><h3>Operaciones monitoreadas</h3><div class="muted">${ops.length} operaciones activas en el catálogo</div></div></div>
+        <div class="security-ops">${ops.map(o=>`<div class="security-op"><span class="op-dot"></span><div><b>${o.name}</b><small>${o.code}</small></div></div>`).join('')}</div>
+      </div>
+    </div>`;
+}
+
+function renderSecurityReports(){
+  return `${securityPageHead('Reportes de seguridad','Consolidado para consulta')}
+    <div class="security-grid">
+      <div class="card"><h3>Reportes disponibles</h3>
+        <div class="security-report-item"><div><b>Reporte operativo</b><span>Consulta general de operaciones y actividad registrada.</span></div><button class="btn btn-ghost btn-sm" data-security-action="operativo">Consultar</button></div>
+        <div class="security-report-item"><div><b>Reporte de novedades</b><span>Consolidado de novedades e incidentes de seguridad.</span></div><button class="btn btn-ghost btn-sm" data-security-action="novedades">Consultar</button></div>
+        <div class="security-report-item"><div><b>Reporte de trazabilidad</b><span>Histórico de actividad disponible en el sistema.</span></div><button class="btn btn-ghost btn-sm" data-security-action="trazabilidad">Consultar</button></div>
+      </div>
+      <div class="card security-highlight"><div class="security-icon">📊</div><h3>Centro de control</h3><p>Este módulo queda separado del flujo de requisiciones. Los accesos de Seguridad no pueden crear ni aprobar requisiciones.</p></div>
+    </div>`;
+}
+
+function renderSecurityIncidents(){
+  return `${securityPageHead('Novedades / incidentes','Registro y seguimiento')}
+    <div class="card">
+      <div class="section-head"><div><h3>Registro de novedades</h3><div class="muted">Módulo preparado para centralizar incidentes de seguridad.</div></div></div>
+      <div class="incident-grid">
+        <div class="incident-type"><span>🚨</span><b>Incidente</b><small>Eventos de seguridad que requieren seguimiento.</small></div>
+        <div class="incident-type"><span>⚠️</span><b>Novedad</b><small>Alertas o situaciones operativas para registrar.</small></div>
+        <div class="incident-type"><span>🔎</span><b>Seguimiento</b><small>Casos abiertos pendientes de cierre.</small></div>
+      </div>
+      <div class="security-empty"><div class="security-empty-icon">🛡</div><b>Sin novedades cargadas</b><span>Cuando conectemos este módulo con el registro de seguridad, aquí aparecerán los casos y su estado.</span></div>
+    </div>`;
+}
+
+function renderSecurityHistory(){
+  const rows = state.requisiciones.slice().sort((a,b)=>new Date(b.fechaSolicitud)-new Date(a.fechaSolicitud)).slice(0,10);
+  return `${securityPageHead('Historial de seguridad','Trazabilidad del sistema')}
+    <div class="card"><h3>Actividad registrada</h3><div class="muted security-note">Vista de consulta. La cuenta de Seguridad no modifica requisiciones.</div>
+      ${rows.length ? rows.map(r=>`<div class="security-history-row"><div><b>${r.cargo || 'Requisición'}</b><span>${r.operacionNombre || r.operacion || 'Operación'} · ${fmtDate(r.fechaSolicitud)}</span></div><span class="status-pill">${r.estado || 'Registrada'}</span></div>`).join('') : emptyState('Aún no hay registros disponibles.')}
+    </div>`;
+}
+
+/* ============================================================
    MAIN EVENTS
    ============================================================ */
 function attachMainEvents(){
+  document.querySelectorAll('[data-security-action]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const action = btn.dataset.securityAction;
+      const labels = {operativo:'Reporte operativo', novedades:'Reporte de novedades', trazabilidad:'Reporte de trazabilidad'};
+      showToast((labels[action] || 'Reporte') + ' listo para conexión con datos.');
+    });
+  });
+
   const refreshBtn = document.getElementById('refresh-btn');
   if(refreshBtn) refreshBtn.addEventListener('click', async ()=>{ await loadRequisiciones(); render(); });
 
