@@ -158,6 +158,7 @@ h1,h2,h3,.display{
 .btn-success:hover{background:#116830;}
 .btn-danger{background:transparent;border:1.5px solid var(--danger); color:var(--danger);}
 .btn-danger:hover{background:var(--danger-bg);}
+.delete-req-btn{margin-left:auto;}
 .btn-sm{padding:8px 14px;font-size:12.5px;}
 .err-msg{
   background:var(--danger-bg); color:var(--danger); font-size:13px; padding:10px 13px;
@@ -537,6 +538,7 @@ const CARGOS = [
   'Auxiliar de Calidad',
   'Certificador',
   'OMT',
+  'OMT – Mujer',
   'Montacarguista',
   'Auxiliar Logístico – Mujer',
   'Auxiliar Logístico – Hombre',
@@ -552,6 +554,10 @@ const CARGO_COMPETENCIAS = {
   'OMT': {
     experiencia: 'Operador OMT con certificación vigente para la operación correspondiente y experiencia comprobable en manejo seguro de equipos y operación logística.',
     aspectos: 'Certificación OMT vigente y verificable, cumplimiento de protocolos de seguridad, inspección preoperacional del equipo, manejo seguro de carga, atención a normas SST y experiencia en operación logística.'
+  },
+  'OMT – Mujer': {
+    experiencia: 'OMT mujer con certificación OMT vigente y verificable, experiencia comprobable en operación logística y manejo seguro de equipos. Debe cumplir los protocolos de seguridad, realizar inspección preoperacional y atender las normas SST de la operación.',
+    aspectos: 'Certificación OMT vigente y verificable obligatoria; experiencia en operación logística; manejo seguro de equipos y carga; inspección preoperacional; cumplimiento de protocolos de seguridad y SST; disponibilidad para laborar en la operación asignada.'
   },
   'Jefe de Operaciones': {
     experiencia: 'Profesional o Tecnólogo en áreas afines, con 2 a 3 años de experiencia en logística, manejo de personal superior a 75 personas, manejo y control de KPI y costos (homologable con experiencia).',
@@ -686,6 +692,15 @@ async function apiUpdateEstado(payload){
     method:'POST',
     headers:{'Content-Type':'text/plain;charset=utf-8'},
     body: JSON.stringify({action:'updateEstado', payload})
+  });
+  return res.json();
+}
+
+async function apiDeleteRequisicion(payload){
+  const res = await fetch(APPS_SCRIPT_URL, {
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({action:'delete', payload})
   });
   return res.json();
 }
@@ -841,7 +856,9 @@ function navItemsFor(role){
     {id:'historial', label:'Historial general'},
   ];
   if(role==='seguridad') return [
-    {id:'dashboard', label:'Resumen de seguridad'},
+    {id:'dashboard', label:'Resumen'},
+    {id:'nueva', label:'Nueva requisición'},
+    {id:'mis', label:'Mis requisiciones'},
     {id:'reportes', label:'Reportes de seguridad'},
     {id:'novedades', label:'Novedades / incidentes'},
     {id:'historial', label:'Historial de seguridad'},
@@ -936,6 +953,8 @@ function renderMain(){
     if(state.view==='historial') return renderListado(state.requisiciones, 'Historial general', 'Todas las requisiciones registradas en el sistema.');
   }
   if(role==='seguridad'){
+    if(state.view==='nueva') return renderNuevaRequisicion();
+    if(state.view==='mis') return renderListado(state.requisiciones.filter(r=>r.solicitanteUsuario===state.user.usuario), 'Mis requisiciones', 'Requisiciones solicitadas por Seguridad.');
     if(state.view==='reportes') return renderSecurityReports();
     if(state.view==='novedades') return renderSecurityIncidents();
     if(state.view==='historial') return renderSecurityHistory();
@@ -1004,7 +1023,7 @@ function renderDashboard(){
       <div><h1>Hola, ${state.user.nombre.replace(/^Coordinador — /,'').split(' ')[0]}</h1><div class="sub">${ROLE_LABEL[role]} · ${todayLabel()}</div></div>
       <div class="page-head-actions">
         <button class="btn btn-ghost btn-sm" id="refresh-btn">${state.loading ? '<span class="spin"></span>' : '↻'} Actualizar</button>
-        ${role==='coordinador' ? `<button class="btn btn-primary" id="dash-new-btn" style="width:auto;">+ Nueva requisición</button>` : ''}
+        ${(role==='coordinador' || role==='seguridad') ? `<button class="btn btn-primary" id="dash-new-btn" style="width:auto;">+ Nueva requisición</button>` : ''}
       </div>
     </div>
     ${stats}
@@ -1029,9 +1048,12 @@ function reqSummaryRow(r){
 
 /* ---------- NUEVA REQUISICIÓN (Coordinador) ---------- */
 function renderNuevaRequisicion(){
+  const esSeguridad = state.user.rol === 'seguridad';
+  const cargoInicial = esSeguridad ? 'OMT – Mujer' : '';
+  const compInicial = CARGO_COMPETENCIAS[cargoInicial];
   return `
     <div class="page-head">
-      <div><h1>Nueva requisición</h1><div class="sub">Completa el formato — se enviará automáticamente a Gerencia para aprobación.</div></div>
+      <div><h1>Nueva requisición</h1><div class="sub">${esSeguridad ? 'Solicitud de personal para Seguridad · el perfil OMT – Mujer se completa automáticamente.' : 'Completa el formato — se enviará automáticamente a Gerencia para aprobación.'}</div></div>
     </div>
     <form id="nueva-req-form">
       <div class="card">
@@ -1040,7 +1062,7 @@ function renderNuevaRequisicion(){
           <div class="field">
             <label>Operación</label>
             <div class="readonly-field">${state.user.operacionNombre || '—'}</div>
-            <div class="hint">Tu usuario está asociado a esta operación. Si necesitas solicitar para otra, contacta a Gerencia.</div>
+            <div class="hint">Tu usuario está asociado a esta operación.</div>
           </div>
           <div class="field">
             <label>Ciudad</label>
@@ -1051,31 +1073,28 @@ function renderNuevaRequisicion(){
           </div>
           <div class="field">
             <label>Cargo requerido</label>
-            <select id="f-cargo" required>
-              <option value="">Selecciona un cargo…</option>
-              ${CARGOS.map(c=>`<option value="${c}">${c}</option>`).join('')}
-            </select>
+            ${esSeguridad ? `<div class="readonly-field" style="font-weight:700;color:var(--ink);">OMT – Mujer</div><input type="hidden" id="f-cargo" value="OMT – Mujer">` : `<select id="f-cargo" required><option value="">Selecciona un cargo…</option>${CARGOS.map(c=>`<option value="${c}">${c}</option>`).join('')}</select>`}
           </div>
           <div class="field">
             <label>N° de vacantes</label>
             <input type="number" id="f-vacantes" min="1" value="1" required>
           </div>
           <div class="field span2">
-            <label>Experiencia requerida <span style="font-weight:400; text-transform:none; color:var(--ink-faint);">(se llena automáticamente al elegir el cargo — puedes ajustarla)</span></label>
-            <textarea id="f-experiencia" rows="2" required placeholder="Selecciona un cargo para autocompletar la experiencia requerida…"></textarea>
+            <label>Experiencia requerida <span style="font-weight:400;text-transform:none;color:var(--ink-faint);">(se llena automáticamente al elegir el cargo)</span></label>
+            <textarea id="f-experiencia" rows="3" required>${esSeguridad ? compInicial.experiencia : ''}</textarea>
           </div>
           <div class="field">
             <label>Fecha requerida de ingreso</label>
             <input type="date" id="f-fecha-ingreso" required>
           </div>
           <div class="field span2">
-            <label>Aspectos relevantes del cargo <span style="font-weight:400; text-transform:none; color:var(--ink-faint);">(se llena automáticamente al elegir el cargo — puedes ajustarla)</span></label>
-            <textarea id="f-aspectos" rows="2" placeholder="Selecciona un cargo para autocompletar los aspectos y habilidades relevantes…"></textarea>
+            <label>Aspectos relevantes del cargo <span style="font-weight:400;text-transform:none;color:var(--ink-faint);">(se llena automáticamente al elegir el cargo)</span></label>
+            <textarea id="f-aspectos" rows="3">${esSeguridad ? compInicial.aspectos : ''}</textarea>
           </div>
-          <div class="field span2" id="omt-cert-wrap" style="display:none;">
+          <div class="field span2" id="omt-cert-wrap" style="display:${esSeguridad ? 'block' : 'none'};">
             <label>Certificación OMT <span style="color:#b42318;">*</span></label>
-            <input type="text" id="f-certificacion-omt" placeholder="Ej.: Certificación OMT vigente — indicar entidad / fecha de vigencia">
-            <div class="hint">Para una requisición de OMT, este campo es obligatorio. Registra la certificación que debe acreditar la persona seleccionada.</div>
+            <input type="text" id="f-certificacion-omt" value="${esSeguridad ? 'Certificación OMT vigente y verificable — obligatoria' : ''}" placeholder="Certificación OMT vigente y verificable">
+            <div class="hint">Para OMT es obligatorio acreditar certificación vigente y verificable.</div>
           </div>
           <div class="field span2">
             <label>Motivo de la requisición</label>
@@ -1086,17 +1105,15 @@ function renderNuevaRequisicion(){
           </div>
         </div>
       </div>
-
       <div class="card">
         <h3>Datos del solicitante</h3>
         <div class="grid3">
-          <div class="field"><label>Coordinador</label><div class="readonly-field">${state.user.nombre.replace(/^Coordinador — /,'')}</div></div>
+          <div class="field"><label>Solicitante</label><div class="readonly-field">${state.user.nombre.replace(/^Coordinador — /,'')}</div></div>
           <div class="field"><label>Correo</label><div class="readonly-field">${state.user.correo}</div></div>
           <div class="field"><label>Cargo del solicitante</label><div class="readonly-field">${state.user.cargo}</div></div>
         </div>
-        <div class="hint">Fecha de solicitud: ${fmtDate(todayISO())} (se registra automáticamente) — enviada desde la cuenta de la operación ${state.user.operacionNombre}.</div>
+        <div class="hint">Fecha de solicitud: ${fmtDate(todayISO())} — la requisición seguirá el flujo normal: ${esSeguridad ? 'Seguridad' : 'Operación'} → Gerencia → Recursos Humanos.</div>
       </div>
-
       <div class="card">
         <h3>Solicitud del cliente (si aplica)</h3>
         <div class="checkbox-row">
@@ -1105,25 +1122,14 @@ function renderNuevaRequisicion(){
         </div>
         <div id="cliente-fields-wrap" style="display:none;">
           <div class="grid2">
-            <div class="field">
-              <label>Nombre de quien lo solicitó (cliente)</label>
-              <input type="text" id="f-cliente-nombre" placeholder="Nombre completo de quien solicita">
-            </div>
-            <div class="field">
-              <label>Correo de quien lo solicitó (cliente)</label>
-              <input type="email" id="f-cliente-correo" placeholder="correo@cliente.com">
-            </div>
-            <div class="field span2">
-              <label>Adjuntar captura de pantalla</label>
-              <input type="file" id="f-cliente-captura" accept="image/*">
-              <div class="hint" id="captura-preview-hint">Adjunta el pantallazo del correo, chat o mensaje donde el cliente solicita el cargo.</div>
-            </div>
+            <div class="field"><label>Nombre de quien lo solicitó (cliente)</label><input type="text" id="f-cliente-nombre" placeholder="Nombre completo de quien solicita"></div>
+            <div class="field"><label>Correo de quien lo solicitó (cliente)</label><input type="email" id="f-cliente-correo" placeholder="correo@cliente.com"></div>
+            <div class="field span2"><label>Adjuntar captura de pantalla</label><input type="file" id="f-cliente-captura" accept="image/*"><div class="hint" id="captura-preview-hint">Adjunta el pantallazo del correo, chat o mensaje donde el cliente solicita el cargo.</div></div>
           </div>
         </div>
       </div>
-
-      <div style="display:flex; gap:12px;">
-        <button type="submit" class="btn btn-primary" style="width:auto; padding:13px 26px;">Enviar a Gerencia</button>
+      <div style="display:flex;gap:12px;">
+        <button type="submit" class="btn btn-primary" style="width:auto;padding:13px 26px;">Enviar a Gerencia</button>
         <button type="button" class="btn btn-ghost" id="cancel-new-btn">Cancelar</button>
       </div>
     </form>
@@ -1171,6 +1177,15 @@ function pipelineFor(r){
     else if(i === activeIdx) cls='on';
     return `<div class="pipe-step ${cls}">${s}</div>`;
   }).join('')}</div>`;
+}
+
+function canDeleteRequisicion(r){
+  const own = r.solicitanteUsuario === state.user.usuario;
+  const allowedRole = state.user.rol === 'coordinador' || state.user.rol === 'seguridad';
+  /* No permitimos borrar una requisición que ya entró a gestión de RH.
+     Así se conserva la trazabilidad del proceso. */
+  const editableState = r.estado === STATUS.PEND || r.estado === STATUS.REJ;
+  return own && allowedRole && editableState;
 }
 
 function renderReqCard(r, gerenciaActions, rhActions){
@@ -1221,6 +1236,11 @@ function renderReqCard(r, gerenciaActions, rhActions){
         <button class="btn btn-success btn-sm close-vacancy-btn" data-id="${r.id}">✓ Marcar vacante cubierta</button>
       </div>
     ` : ''}
+    ${canDeleteRequisicion(r) ? `
+      <div class="req-actions" style="justify-content:flex-end;">
+        <button class="btn btn-danger btn-sm delete-req-btn" data-id="${r.id}">🗑 Eliminar requisición</button>
+      </div>
+    ` : ''}
   </div>`;
 }
 
@@ -1243,7 +1263,7 @@ function renderSecurityDashboard(stats){
         <div class="security-icon">🛡</div>
         <h3>Control de seguridad</h3>
         <p>Panel independiente para centralizar seguimiento, novedades, incidentes y controles de seguridad de INLOTRANS.</p>
-         <div style="margin-top:18px;"><button class="btn btn-primary" id="security-omt-btn" style="width:auto;">+ Solicitar OMT mujer</button></div>
+         <div style="margin-top:18px; display:flex; gap:10px; flex-wrap:wrap;"><button class="btn btn-primary" id="security-omt-btn" style="width:auto;">+ Nueva requisición</button><span class="hint" style="align-self:center;">Para Seguridad, el cargo se completa automáticamente como OMT – Mujer.</span></div>
         <div class="security-list">
           <div><span>✓</span> Monitoreo de operaciones</div>
           <div><span>✓</span> Seguimiento de novedades</div>
@@ -1258,30 +1278,6 @@ function renderSecurityDashboard(stats){
     </div>`;
 }
 
-function renderNuevaOMTMujer(){
-  return `
-    <div class="page-head">
-      <div><h1>Solicitud OMT mujer</h1><div class="sub">Requisición de personal para Seguridad · los requisitos técnicos se completan automáticamente.</div></div>
-    </div>
-    <form id="nueva-omt-form">
-      <div class="card">
-        <h3>Datos de la requisición</h3>
-        <div class="grid2">
-          <div class="field"><label>Operación</label><div class="readonly-field">Seguridad</div></div>
-          <div class="field"><label>Cargo requerido</label><div class="readonly-field">OMT – Mujer</div></div>
-          <div class="field"><label>Ciudad</label><select id="omt-ciudad" required><option value="">Selecciona una ciudad…</option>${CIUDADES.map(c=>`<option value="${c}">${c}</option>`).join('')}</select></div>
-          <div class="field"><label>N° de vacantes</label><input type="number" id="omt-vacantes" min="1" value="1" required></div>
-          <div class="field span2"><label>Descripción / experiencia requerida</label><textarea id="omt-experiencia" rows="3" readonly>OMT mujer, con certificación OMT vigente y verificable, experiencia comprobable en manejo seguro de equipos y operación logística. Debe cumplir los protocolos de seguridad, realizar inspección preoperacional del equipo, manejo seguro de carga y normas SST.</textarea></div>
-          <div class="field span2"><label>Aspectos relevantes / requisitos</label><textarea id="omt-aspectos" rows="3" readonly>Certificación OMT vigente y verificable; experiencia en operación logística; cumplimiento de protocolos de seguridad; inspección preoperacional del equipo; manejo seguro de carga; cumplimiento de normas SST; disponibilidad para laborar en la operación asignada.</textarea></div>
-          <div class="field"><label>Certificación requerida</label><div class="readonly-field">OMT vigente y verificable — obligatoria</div></div>
-          <div class="field"><label>Fecha requerida de ingreso</label><input type="date" id="omt-fecha" required></div>
-          <div class="field span2"><label>Motivo</label><select id="omt-motivo" required><option value="">Selecciona un motivo…</option>${MOTIVOS.map(m=>`<option value="${m}">${m}</option>`).join('')}</select></div>
-        </div>
-      </div>
-      <div class="card"><h3>Solicitante</h3><div class="grid3"><div class="field"><label>Solicita</label><div class="readonly-field">${state.user.nombre}</div></div><div class="field"><label>Correo</label><div class="readonly-field">${state.user.correo}</div></div><div class="field"><label>Área</label><div class="readonly-field">Seguridad INLOTRANS</div></div></div><div class="hint">La solicitud seguirá el mismo flujo: Seguridad → Gerencia → Recursos Humanos.</div></div>
-      <div style="display:flex;gap:12px;"><button type="submit" class="btn btn-primary" style="width:auto;padding:13px 26px;">Enviar requisición a Gerencia</button><button type="button" class="btn btn-ghost" id="cancel-omt-btn">Cancelar</button></div>
-    </form>`;
-}
 
 function renderSecurityReports(){
   return `${securityPageHead('Reportes de seguridad','Consolidado para consulta')}
@@ -1311,7 +1307,7 @@ function renderSecurityIncidents(){
 function renderSecurityHistory(){
   const rows = state.requisiciones.slice().sort((a,b)=>new Date(b.fechaSolicitud)-new Date(a.fechaSolicitud)).slice(0,10);
   return `${securityPageHead('Historial de seguridad','Trazabilidad del sistema')}
-    <div class="card"><h3>Actividad registrada</h3><div class="muted security-note">Vista de consulta. La cuenta de Seguridad no modifica requisiciones.</div>
+    <div class="card"><h3>Actividad registrada</h3><div class="muted security-note">Consulta y seguimiento de requisiciones solicitadas por Seguridad.</div>
       ${rows.length ? rows.map(r=>`<div class="security-history-row"><div><b>${r.cargo || 'Requisición'}</b><span>${r.operacionNombre || r.operacion || 'Operación'} · ${fmtDate(r.fechaSolicitud)}</span></div><span class="status-pill">${r.estado || 'Registrada'}</span></div>`).join('') : emptyState('Aún no hay registros disponibles.')}
     </div>`;
 }
@@ -1332,32 +1328,8 @@ function attachMainEvents(){
   if(refreshBtn) refreshBtn.addEventListener('click', async ()=>{ await loadRequisiciones(); render(); });
 
   const securityOmtBtn = document.getElementById('security-omt-btn');
-  if(securityOmtBtn) securityOmtBtn.addEventListener('click', ()=>{ state.view='nueva-omt'; render(); });
+  if(securityOmtBtn) securityOmtBtn.addEventListener('click', ()=>{ state.view='nueva'; render(); });
 
-  const cancelOmtBtn = document.getElementById('cancel-omt-btn');
-  if(cancelOmtBtn) cancelOmtBtn.addEventListener('click', ()=>{ state.view='dashboard'; render(); });
-
-  const omtForm = document.getElementById('nueva-omt-form');
-  if(omtForm){
-    omtForm.addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      const btn=omtForm.querySelector('button[type=submit]'); btn.disabled=true; btn.textContent='Enviando…';
-      const payload={
-        operacionCode:'SeguridadInlo', operacionNombre:'Seguridad',
-        ciudad:document.getElementById('omt-ciudad').value, cargo:'OMT – Mujer',
-        vacantes:parseInt(document.getElementById('omt-vacantes').value||'1'),
-        experiencia:document.getElementById('omt-experiencia').value.trim(),
-        fechaIngreso:document.getElementById('omt-fecha').value,
-        aspectos:document.getElementById('omt-aspectos').value.trim(),
-        certificacionOMT:'OMT vigente y verificable — obligatoria',
-        motivo:document.getElementById('omt-motivo').value,
-        solicitanteUsuario:state.user.usuario, solicitanteNombre:state.user.nombre,
-        solicitanteCorreo:state.user.correo, solicitanteCargo:'Seguridad INLOTRANS', fechaSolicitud:todayISO(),
-        clienteSolicito:false, clienteNombre:'', clienteCorreo:'', capturaDataUrl:'', capturaFileName:''
-      };
-      try{ const result=await apiCreateRequisicion(payload); if(result&&result.ok){ showToast(`Requisición OMT mujer #${result.consecutivo} enviada a Gerencia.`); await loadRequisiciones(); state.view='historial'; render(); } else { showToast('No se pudo enviar la requisición.',true); btn.disabled=false; btn.textContent='Enviar requisición a Gerencia'; } }catch(err){ showToast('Error de conexión al enviar.',true); btn.disabled=false; btn.textContent='Enviar requisición a Gerencia'; }
-    });
-  }
 
   const newBtn = document.getElementById('dash-new-btn');
   if(newBtn) newBtn.addEventListener('click', ()=>{ pendingCaptura = null; state.view='nueva'; render(); });
@@ -1382,7 +1354,7 @@ function attachMainEvents(){
       });
 
       const updateOMTRequirement = ()=>{
-        const isOMT = cargoSelect.value === 'OMT';
+        const isOMT = cargoSelect.value === 'OMT' || cargoSelect.value === 'OMT – Mujer';
         const wrap = document.getElementById('omt-cert-wrap');
         const cert = document.getElementById('f-certificacion-omt');
         if(!wrap || !cert) return;
@@ -1453,7 +1425,7 @@ function attachMainEvents(){
         operacionCode: state.user.operacionCode,
         operacionNombre: state.user.operacionNombre,
         ciudad: document.getElementById('f-ciudad').value,
-        cargo: document.getElementById('f-cargo').value,
+        cargo: state.user.rol==='seguridad' ? 'OMT – Mujer' : document.getElementById('f-cargo').value,
         vacantes: parseInt(document.getElementById('f-vacantes').value || '1'),
         experiencia: document.getElementById('f-experiencia').value.trim(),
         fechaIngreso: document.getElementById('f-fecha-ingreso').value,
@@ -1516,6 +1488,36 @@ function attachMainEvents(){
   });
   document.querySelectorAll('.close-vacancy-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>updateEstado(btn.dataset.id, STATUS.DONE, 'Vacante cubierta por RH'));
+  });
+  document.querySelectorAll('.delete-req-btn').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const req = state.requisiciones.find(r=>String(r.id)===String(btn.dataset.id));
+      if(!req || !canDeleteRequisicion(req)) return;
+      const ref = req.consecutivo ? `REQ-${req.consecutivo}` : 'esta requisición';
+      if(!confirm(`¿Eliminar ${ref} de forma permanente?\n\nEsta acción no se puede deshacer.`)) return;
+      btn.disabled = true;
+      btn.textContent = 'Eliminando…';
+      try{
+        const res = await apiDeleteRequisicion({
+          id:req.id,
+          solicitanteUsuario:state.user.usuario,
+          solicitanteRol:state.user.rol,
+          usuario:state.user.usuario,
+          fecha:todayISO()
+        });
+        if(res && res.ok){
+          showToast(`${ref} eliminada correctamente.`);
+          await loadRequisiciones();
+          render();
+        }else{
+          showToast((res && res.message) || 'No se pudo eliminar la requisición.', true);
+          btn.disabled=false; btn.textContent='🗑 Eliminar requisición';
+        }
+      }catch(err){
+        showToast('Error de conexión al eliminar. Verifica el Apps Script.', true);
+        btn.disabled=false; btn.textContent='🗑 Eliminar requisición';
+      }
+    });
   });
 }
 
