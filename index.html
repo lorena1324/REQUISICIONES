@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>INLOTRANS · Requisición de Personal</title>
+<title>INLOTRANS · Portal Operativo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
@@ -118,9 +118,9 @@ h1,h2,h3,.display{
 .login-card{width:100%;max-width:380px;}
 .login-card h2{font-size:15px;color:var(--ink-soft);font-weight:500;letter-spacing:.08em;}
 .login-card h1{font-size:28px;color:var(--ink);margin-top:6px;font-weight:600;}
-.role-tabs{display:flex;gap:8px;margin:26px 0 22px;}
+.role-tabs{display:flex;gap:7px;margin:26px 0 22px;flex-wrap:wrap;}
 .role-tab{
-  flex:1; text-align:center; padding:12px 6px; border-radius:8px;
+  flex:1 1 100px; text-align:center; padding:12px 6px; border-radius:8px;
   border:1.5px solid var(--line); background:#FAFBFC; cursor:pointer;
   font-size:12px; font-weight:700; letter-spacing:.03em; color:var(--ink-soft);
   text-transform:uppercase; font-family:'Inter'; transition:.15s;
@@ -158,6 +158,7 @@ h1,h2,h3,.display{
 .btn-success:hover{background:#116830;}
 .btn-danger{background:transparent;border:1.5px solid var(--danger); color:var(--danger);}
 .btn-danger:hover{background:var(--danger-bg);}
+.delete-req-btn{margin-left:auto;}
 .btn-sm{padding:8px 14px;font-size:12.5px;}
 .err-msg{
   background:var(--danger-bg); color:var(--danger); font-size:13px; padding:10px 13px;
@@ -321,6 +322,46 @@ h1,h2,h3,.display{
   .req-details{grid-template-columns:1fr 1fr;}
   .detail-item.wide{grid-column:span 2;}
 }
+
+/* ============================================================
+   SECURITY MODULE STYLES
+   ============================================================ */
+.security-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;margin-top:18px;}
+.security-card{position:relative;overflow:hidden;}
+.security-card:after{content:'SECURITY';position:absolute;right:-10px;bottom:-22px;font-family:'Oswald';font-size:80px;font-weight:700;color:rgba(11,18,32,.035);letter-spacing:.04em;}
+.security-icon{width:44px;height:44px;border-radius:12px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:21px;margin-bottom:16px;}
+.security-card h3,.security-highlight h3{font-size:18px;margin:0 0 8px;}
+.security-card p,.security-highlight p{color:var(--ink-soft);font-size:13px;line-height:1.65;max-width:650px;}
+.security-list{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px;}
+.security-list div{background:#F8F9FB;border:1px solid var(--line);padding:12px;border-radius:8px;font-size:12px;color:var(--ink-soft);font-weight:600;}
+.security-list span{color:var(--success);margin-right:7px;}
+.security-ops{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:15px;max-height:340px;overflow:auto;}
+.security-op{display:flex;align-items:center;gap:9px;border:1px solid var(--line);padding:10px;border-radius:8px;background:#FAFBFC;}
+.security-op b{display:block;font-size:12px;color:var(--ink);}
+.security-op small{display:block;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:9px;margin-top:3px;}
+.op-dot{width:8px;height:8px;border-radius:50%;background:var(--success);flex:0 0 auto;box-shadow:0 0 0 3px var(--success-bg);}
+.security-report-item{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:16px 0;border-bottom:1px solid var(--line);}
+.security-report-item:last-child{border-bottom:0;}
+.security-report-item b{display:block;font-size:13px;margin-bottom:4px;}
+.security-report-item span{display:block;color:var(--ink-soft);font-size:11.5px;}
+.security-highlight{background:linear-gradient(145deg,#F8F9FB,#fff);}
+.incident-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px;}
+.incident-type{border:1px solid var(--line);border-radius:10px;padding:16px;background:#FAFBFC;}
+.incident-type span{font-size:22px;display:block;margin-bottom:10px;}
+.incident-type b{display:block;font-size:13px;}
+.incident-type small{display:block;color:var(--ink-soft);font-size:11px;line-height:1.5;margin-top:5px;}
+.security-empty{text-align:center;border:1px dashed #CBD1DB;border-radius:10px;padding:35px 20px;margin-top:18px;background:#FAFBFC;}
+.security-empty-icon{font-size:28px;margin-bottom:8px;}
+.security-empty b{display:block;font-size:14px;}
+.security-empty span{display:block;color:var(--ink-soft);font-size:11.5px;margin-top:6px;}
+.security-note{margin-bottom:10px;}
+.security-history-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--line);gap:15px;}
+.security-history-row:last-child{border-bottom:0;}
+.security-history-row b{display:block;font-size:12.5px;}
+.security-history-row span:not(.status-pill){display:block;color:var(--ink-soft);font-size:11px;margin-top:4px;}
+.status-pill{padding:5px 9px;border-radius:20px;background:var(--info-bg);color:var(--info);font-size:10px;font-weight:700;white-space:nowrap;}
+@media(max-width:900px){.security-grid{grid-template-columns:1fr}.incident-grid{grid-template-columns:1fr}.security-list{grid-template-columns:1fr}.security-ops{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -331,7 +372,7 @@ h1,h2,h3,.display{
      página queda en blanco (parece que "el login no deja entrar"). Esto detecta
      ese caso y lo muestra en pantalla en vez de dejarlo mudo. -->
 <script>
-window.APP_VERSION = '2026.09.03';
+window.APP_VERSION = '2026.09.13';
 window.addEventListener('error', function(ev){
   var app = document.getElementById('app');
   if(!app || app.innerHTML.trim() !== '') return;
@@ -395,6 +436,7 @@ const OPERACIONES = [
   {code:'GIRON', name:'Girón'},
   {code:'PHARMA', name:'Pharma Trading'},
   {code:'logisfashion', name:'Logisfashion'},
+  {code:'SeguridadInlo', name:'Seguridad'},
   {code:'INTERPACK', name:'Interpack'}
   
   
@@ -453,7 +495,7 @@ const COORD_EXTRA = [
     operacionCode:'INL-MULT',
     operacionNombre:'Multidimensionales',
   },
-  {
+    {
     usuario:'miguelrodriguezj',
     password:'2143658709',
     nombre:'MIGUEL RODRIGUEZ',
@@ -472,7 +514,7 @@ const USERS = [
   {usuario:'rh', password:'rh2026', nombre:'Recursos Humanos', cargo:'Gestión Humana', correo:'rh@inlotrans.com.co', rol:'rh'},
 ];
 
-const ROLE_LABEL = {coordinador:'Coordinador', gerencia:'Gerencia', rh:'Recursos Humanos'};
+const ROLE_LABEL = {coordinador:'Coordinador', gerencia:'Gerencia', rh:'Recursos Humanos', seguridad:'Seguridad'};
 
 /* Catálogo de cargos, alineado con el documento de Competencias por Cargo. */
 const CARGOS = [
@@ -486,6 +528,8 @@ const CARGOS = [
   'Analista Logístico',
   'Auxiliar de Calidad',
   'Certificador',
+  'AUXILIAR DE PREVENCION DE PERDIDAS',
+  'AUXILIAR DE PREVENCION DE PERDIDAS – Mujer',
   'Montacarguista',
   'Auxiliar Logístico – Mujer',
   'Auxiliar Logístico – Hombre',
@@ -498,6 +542,14 @@ const CARGOS = [
    tomadas del documento oficial "Competencias por Cargo" de Inlotrans.
    Se usan para autocompletar el formulario de requisición según el cargo seleccionado. */
 const CARGO_COMPETENCIAS = {
+  'AUXILIAR DE PREVENCION DE PERDIDAS': {
+    experiencia: 'Operador SEGURIDAD con certificación vigente para la operación correspondiente y experiencia comprobable en manejo seguro de equipos y operación logística.',
+    aspectos: 'Certificación SEGURIDAD vigente y verificable, cumplimiento de protocolos de seguridad, inspección preoperacional del equipo, manejo seguro de carga, atención a normas SST y experiencia en operación logística.'
+  },
+  'AUXILIAR DE PREVENCION DE PERDIDAS – Mujer': {
+    experiencia: 'AUXILIAR DE PREVENCION DE PERDIDAS mujer con certificación SEGURIDAD vigente y verificable, experiencia comprobable en operación logística y manejo seguro de equipos. Debe cumplir los protocolos de seguridad, realizar inspección preoperacional y atender las normas SST de la operación.',
+    aspectos: 'Certificación SEGURIDAD vigente y verificable obligatoria; experiencia en operación logística; manejo seguro de equipos y carga; inspección preoperacional; cumplimiento de protocolos de seguridad y SST; disponibilidad para laborar en la operación asignada.'
+  },
   'Jefe de Operaciones': {
     experiencia: 'Profesional o Tecnólogo en áreas afines, con 2 a 3 años de experiencia en logística, manejo de personal superior a 75 personas, manejo y control de KPI y costos (homologable con experiencia).',
     aspectos: 'Habilidades en comunicación, toma de decisiones, servicio al cliente, análisis, resolución de conflictos, manejo de herramientas ofimáticas y orientación a resultados.'
@@ -576,6 +628,7 @@ const STATUS = {
   REJ:'Rechazada',
   PROC:'En Proceso de Búsqueda',
   DONE:'Vacante Cubierta',
+  ARCH:'Archivada',
 };
 
 /* ============================================================
@@ -635,6 +688,15 @@ async function apiUpdateEstado(payload){
   return res.json();
 }
 
+async function apiDeleteRequisicion(payload){
+  const res = await fetch(APPS_SCRIPT_URL, {
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({action:'delete', payload})
+  });
+  return res.json();
+}
+
 function fmtDate(d){
   const dt = new Date(d);
   return dt.toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'});
@@ -663,7 +725,7 @@ function renderLogin(){
           <div class="brand-chip"><img src="${LOGO_ICON}" alt="Inlotrans"></div>
           <div>
             <div class="brand-name">INLOTRANS S.A.S.</div>
-            <div class="brand-sub">Gestión Humana · SIG-F-GH-014</div>
+            <div class="brand-sub">Portal Operativo · Gestión y Seguridad</div>
           </div>
         </div>
         <div class="pipeline-hero">
@@ -688,6 +750,7 @@ function renderLogin(){
           <div class="role-tab ${state.loginRole==='coordinador'?'active':''}" data-role="coordinador">Coordinador</div>
           <div class="role-tab ${state.loginRole==='gerencia'?'active':''}" data-role="gerencia">Gerencia</div>
           <div class="role-tab ${state.loginRole==='rh'?'active':''}" data-role="rh">Rec. Humanos</div>
+          <div class="role-tab ${state.loginRole==='seguridad'?'active':''}" data-role="seguridad">Seguridad</div>
         </div>
 
         ${state.loginError ? `<div class="err-msg">${state.loginError}</div>` : ''}
@@ -711,7 +774,13 @@ function renderLogin(){
           <b>Acceso por operación</b><br>
           Usuario → nombre de tu operación en minúsculas y sin espacios/tildes (ej. <b>operacion</b>)<br>
           Contraseña → ese mismo texto seguido de 2026 (ej. <b>operacion2026</b>)<br>
-          <span style="display:block;margin-top:6px;">Si no conoces el usuario exacto de tu operación, pídelo a el equipo de sistemas.</span>
+          <span style="display:block;margin-top:6px;">Si no conoces el usuario exacto de tu operación, pídelo al equipo de sistemas.</span>
+        </div>` : state.loginRole==='seguridad' ? `
+        <div class="demo-creds">
+          <b>Acceso Seguridad INLOTRANS</b><br>
+          Usuario → <b>seguridad</b><br>
+          Contraseña → <b>seguridad2026*</b><br>
+          <span style="display:block;margin-top:6px;">Este acceso entra únicamente al panel independiente de Seguridad.</span>
         </div>` : `
         <div class="demo-creds">
           Usa el usuario y contraseña que te asignó Gerencia / Recursos Humanos.
@@ -777,6 +846,15 @@ function navItemsFor(role){
     {id:'dashboard', label:'Resumen'},
     {id:'pendientes', label:'Pendientes de aprobación'},
     {id:'historial', label:'Historial general'},
+    {id:'archivadas', label:'Eliminadas / Archivadas'},
+  ];
+  if(role==='seguridad') return [
+    {id:'dashboard', label:'Resumen'},
+    {id:'nueva', label:'Nueva requisición'},
+    {id:'mis', label:'Mis requisiciones'},
+    {id:'reportes', label:'Reportes de seguridad'},
+    {id:'novedades', label:'Novedades / incidentes'},
+    {id:'historial', label:'Historial de seguridad'},
   ];
   return [
     {id:'dashboard', label:'Resumen'},
@@ -798,7 +876,7 @@ function renderShell(){
           <div class="brand-chip"><img src="${LOGO_ICON}" alt="Inlotrans"></div>
           <div>
             <div class="brand-name" style="font-size:15px;">INLOTRANS</div>
-            <div class="brand-sub" style="font-size:9.5px;">Requisición de personal</div>
+            <div class="brand-sub" style="font-size:9.5px;">${role==='seguridad' ? 'Centro de Seguridad' : 'Requisición de personal'}</div>
           </div>
         </div>
         <div class="nav-section">Navegación</div>
@@ -860,12 +938,21 @@ function renderMain(){
   }
   if(role==='gerencia'){
     if(state.view==='pendientes') return renderListado(state.requisiciones.filter(r=>r.estado===STATUS.PEND), 'Pendientes de aprobación', 'Requisiciones esperando tu decisión.', true);
-    if(state.view==='historial') return renderListado(state.requisiciones, 'Historial general', 'Todas las requisiciones registradas en el sistema.');
+    if(state.view==='historial') return renderListado(state.requisiciones.filter(r=>r.estado!==STATUS.ARCH), 'Historial general', 'Todas las requisiciones activas y finalizadas del sistema.');
+    if(state.view==='archivadas') return renderListado(state.requisiciones.filter(r=>r.estado===STATUS.ARCH), 'Eliminadas / Archivadas', 'Requisiciones que Gerencia decidió retirar del historial operativo.');
   }
   if(role==='rh'){
     if(state.view==='iniciar') return renderListado(state.requisiciones.filter(r=>r.estado===STATUS.APPR), 'Para iniciar búsqueda', 'Requisiciones aprobadas por gerencia, listas para iniciar selección.', false, true);
     if(state.view==='proceso') return renderListado(state.requisiciones.filter(r=>r.estado===STATUS.PROC), 'En proceso de búsqueda', 'Vacantes que RH está gestionando actualmente.', false, true);
-    if(state.view==='historial') return renderListado(state.requisiciones, 'Historial general', 'Todas las requisiciones registradas en el sistema.');
+    if(state.view==='historial') return renderListado(state.requisiciones.filter(r=>r.estado!==STATUS.ARCH), 'Historial general', 'Todas las requisiciones activas y finalizadas del sistema.');
+    if(state.view==='archivadas') return renderListado(state.requisiciones.filter(r=>r.estado===STATUS.ARCH), 'Eliminadas / Archivadas', 'Requisiciones que Gerencia decidió retirar del historial operativo.');
+  }
+  if(role==='seguridad'){
+    if(state.view==='nueva') return renderNuevaRequisicion();
+    if(state.view==='mis') return renderListado(state.requisiciones.filter(r=>r.solicitanteUsuario===state.user.usuario), 'Mis requisiciones', 'Requisiciones solicitadas por Seguridad.');
+    if(state.view==='reportes') return renderSecurityReports();
+    if(state.view==='novedades') return renderSecurityIncidents();
+    if(state.view==='historial') return renderSecurityHistory();
   }
   return renderDashboard();
 }
@@ -873,7 +960,7 @@ function renderMain(){
 /* ---------- DASHBOARD ---------- */
 function renderDashboard(){
   const role = state.user.rol;
-  const all = state.requisiciones;
+  const all = state.requisiciones.filter(r=>r.estado!==STATUS.ARCH);
   const mine = all.filter(r=>r.solicitanteUsuario===state.user.usuario);
   const counts = {
     pend: all.filter(r=>r.estado===STATUS.PEND).length,
@@ -890,6 +977,17 @@ function renderDashboard(){
         <div class="stat-card accent"><div class="n">${mine.filter(r=>r.estado===STATUS.PEND).length}</div><div class="l">Pendientes de gerencia</div></div>
         <div class="stat-card"><div class="n">${mine.filter(r=>r.estado===STATUS.PROC||r.estado===STATUS.APPR).length}</div><div class="l">En búsqueda por RH</div></div>
         <div class="stat-card"><div class="n">${mine.filter(r=>r.estado===STATUS.DONE).length}</div><div class="l">Vacantes cubiertas</div></div>
+      </div>`;
+  } else if(role==='seguridad'){
+    const securityOps = OPERACIONES.filter(o=>o.name !== 'Seguridad').length;
+    const totalReq = all.length;
+    const activeReq = counts.pend + counts.appr + counts.proc;
+    stats = `
+      <div class="stat-row">
+        <div class="stat-card accent"><div class="n">${securityOps}</div><div class="l">Operaciones monitoreadas</div></div>
+        <div class="stat-card"><div class="n">${activeReq}</div><div class="l">Procesos activos</div></div>
+        <div class="stat-card"><div class="n">${totalReq}</div><div class="l">Registros del sistema</div></div>
+        <div class="stat-card"><div class="n">${counts.done}</div><div class="l">Procesos cerrados</div></div>
       </div>`;
   } else if(role==='gerencia'){
     stats = `
@@ -913,12 +1011,14 @@ function renderDashboard(){
   const visibles = role==='coordinador' ? mine : all;
   const recent = [...visibles].sort((a,b)=> new Date(b.fechaSolicitud)-new Date(a.fechaSolicitud)).slice(0,5);
 
+  if(role==='seguridad') return renderSecurityDashboard(stats);
+
   return `
     <div class="page-head">
       <div><h1>Hola, ${state.user.nombre.replace(/^Coordinador — /,'').split(' ')[0]}</h1><div class="sub">${ROLE_LABEL[role]} · ${todayLabel()}</div></div>
       <div class="page-head-actions">
         <button class="btn btn-ghost btn-sm" id="refresh-btn">${state.loading ? '<span class="spin"></span>' : '↻'} Actualizar</button>
-        ${role==='coordinador' ? `<button class="btn btn-primary" id="dash-new-btn" style="width:auto;">+ Nueva requisición</button>` : ''}
+        ${(role==='coordinador' || role==='seguridad') ? `<button class="btn btn-primary" id="dash-new-btn" style="width:auto;">+ Nueva requisición</button>` : ''}
       </div>
     </div>
     ${stats}
@@ -943,9 +1043,12 @@ function reqSummaryRow(r){
 
 /* ---------- NUEVA REQUISICIÓN (Coordinador) ---------- */
 function renderNuevaRequisicion(){
+  const esSeguridad = state.user.rol === 'seguridad';
+  const cargoInicial = esSeguridad ? 'AUXILIAR DE PREVENCION DE PERDIDAS' : '';
+  const compInicial = CARGO_COMPETENCIAS[cargoInicial] || {experiencia:'', aspectos:''};
   return `
     <div class="page-head">
-      <div><h1>Nueva requisición</h1><div class="sub">Completa el formato — se enviará automáticamente a Gerencia para aprobación.</div></div>
+      <div><h1>Nueva requisición</h1><div class="sub">${esSeguridad ? 'Solicitud de personal para Seguridad · el perfil AUXILIAR DE PREVENCION DE PERDIDAS se completa automáticamente.' : 'Completa el formato — se enviará automáticamente a Gerencia para aprobación.'}</div></div>
     </div>
     <form id="nueva-req-form">
       <div class="card">
@@ -954,7 +1057,7 @@ function renderNuevaRequisicion(){
           <div class="field">
             <label>Operación</label>
             <div class="readonly-field">${state.user.operacionNombre || '—'}</div>
-            <div class="hint">Tu usuario está asociado a esta operación. Si necesitas solicitar para otra, contacta a Gerencia.</div>
+            <div class="hint">Tu usuario está asociado a esta operación.</div>
           </div>
           <div class="field">
             <label>Ciudad</label>
@@ -965,28 +1068,24 @@ function renderNuevaRequisicion(){
           </div>
           <div class="field">
             <label>Cargo requerido</label>
-            <select id="f-cargo" required>
-              <option value="">Selecciona un cargo…</option>
-              ${CARGOS.map(c=>`<option value="${c}">${c}</option>`).join('')}
-            </select>
+            ${esSeguridad ? `<div class="readonly-field" style="font-weight:700;color:var(--ink);">AUXILIAR DE PREVENCION DE PERDIDAS</div><input type="hidden" id="f-cargo" value="AUXILIAR DE PREVENCION DE PERDIDAS">` : `<select id="f-cargo" required><option value="">Selecciona un cargo…</option>${CARGOS.map(c=>`<option value="${c}">${c}</option>`).join('')}</select>`}
           </div>
           <div class="field">
             <label>N° de vacantes</label>
             <input type="number" id="f-vacantes" min="1" value="1" required>
           </div>
           <div class="field span2">
-            <label>Experiencia requerida <span style="font-weight:400; text-transform:none; color:var(--ink-faint);">(se llena automáticamente al elegir el cargo — puedes ajustarla)</span></label>
-            <textarea id="f-experiencia" rows="2" required placeholder="Selecciona un cargo para autocompletar la experiencia requerida…"></textarea>
+            <label>Experiencia requerida <span style="font-weight:400;text-transform:none;color:var(--ink-faint);">(se llena automáticamente al elegir el cargo)</span></label>
+            <textarea id="f-experiencia" rows="3" required>${esSeguridad ? compInicial.experiencia : ''}</textarea>
           </div>
           <div class="field">
             <label>Fecha requerida de ingreso</label>
             <input type="date" id="f-fecha-ingreso" required>
           </div>
           <div class="field span2">
-            <label>Aspectos relevantes del cargo <span style="font-weight:400; text-transform:none; color:var(--ink-faint);">(se llena automáticamente al elegir el cargo — puedes ajustarla)</span></label>
-            <textarea id="f-aspectos" rows="2" placeholder="Selecciona un cargo para autocompletar los aspectos y habilidades relevantes…"></textarea>
-          </div>
-          <div class="field span2">
+            <label>Aspectos relevantes del cargo <span style="font-weight:400;text-transform:none;color:var(--ink-faint);">(se llena automáticamente al elegir el cargo)</span></label>
+            <textarea id="f-aspectos" rows="3">${esSeguridad ? compInicial.aspectos : ''}</textarea>
+          </div><div class="field span2">
             <label>Motivo de la requisición</label>
             <select id="f-motivo" required>
               <option value="">Selecciona un motivo…</option>
@@ -995,17 +1094,15 @@ function renderNuevaRequisicion(){
           </div>
         </div>
       </div>
-
       <div class="card">
         <h3>Datos del solicitante</h3>
         <div class="grid3">
-          <div class="field"><label>Coordinador</label><div class="readonly-field">${state.user.nombre.replace(/^Coordinador — /,'')}</div></div>
+          <div class="field"><label>Solicitante</label><div class="readonly-field">${state.user.nombre.replace(/^Coordinador — /,'')}</div></div>
           <div class="field"><label>Correo</label><div class="readonly-field">${state.user.correo}</div></div>
           <div class="field"><label>Cargo del solicitante</label><div class="readonly-field">${state.user.cargo}</div></div>
         </div>
-        <div class="hint">Fecha de solicitud: ${fmtDate(todayISO())} (se registra automáticamente) — enviada desde la cuenta de la operación ${state.user.operacionNombre}.</div>
+        <div class="hint">Fecha de solicitud: ${fmtDate(todayISO())} — la requisición seguirá el flujo normal: ${esSeguridad ? 'Seguridad' : 'Operación'} → Gerencia → Recursos Humanos.</div>
       </div>
-
       <div class="card">
         <h3>Solicitud del cliente (si aplica)</h3>
         <div class="checkbox-row">
@@ -1014,25 +1111,14 @@ function renderNuevaRequisicion(){
         </div>
         <div id="cliente-fields-wrap" style="display:none;">
           <div class="grid2">
-            <div class="field">
-              <label>Nombre de quien lo solicitó (cliente)</label>
-              <input type="text" id="f-cliente-nombre" placeholder="Nombre completo de quien solicita">
-            </div>
-            <div class="field">
-              <label>Correo de quien lo solicitó (cliente)</label>
-              <input type="email" id="f-cliente-correo" placeholder="correo@cliente.com">
-            </div>
-            <div class="field span2">
-              <label>Adjuntar captura de pantalla</label>
-              <input type="file" id="f-cliente-captura" accept="image/*">
-              <div class="hint" id="captura-preview-hint">Adjunta el pantallazo del correo, chat o mensaje donde el cliente solicita el cargo.</div>
-            </div>
+            <div class="field"><label>Nombre de quien lo solicitó (cliente)</label><input type="text" id="f-cliente-nombre" placeholder="Nombre completo de quien solicita"></div>
+            <div class="field"><label>Correo de quien lo solicitó (cliente)</label><input type="email" id="f-cliente-correo" placeholder="correo@cliente.com"></div>
+            <div class="field span2"><label>Adjuntar captura de pantalla</label><input type="file" id="f-cliente-captura" accept="image/*"><div class="hint" id="captura-preview-hint">Adjunta el pantallazo del correo, chat o mensaje donde el cliente solicita el cargo.</div></div>
           </div>
         </div>
       </div>
-
-      <div style="display:flex; gap:12px;">
-        <button type="submit" class="btn btn-primary" style="width:auto; padding:13px 26px;">Enviar a Gerencia</button>
+      <div style="display:flex;gap:12px;">
+        <button type="submit" class="btn btn-primary" style="width:auto;padding:13px 26px;">Enviar a Gerencia</button>
         <button type="button" class="btn btn-ghost" id="cancel-new-btn">Cancelar</button>
       </div>
     </form>
@@ -1082,6 +1168,23 @@ function pipelineFor(r){
   }).join('')}</div>`;
 }
 
+function canDeleteRequisicion(r){
+  if(!state.user) return false;
+  // Gerencia puede retirar del historial operativo las requisiciones que ya decidió.
+  if(state.user.rol === 'gerencia'){
+    return r.estado === STATUS.APPR || r.estado === STATUS.REJ;
+  }
+  // Se conserva la regla anterior para coordinadores/Seguridad.
+  const own = r.solicitanteUsuario === state.user.usuario;
+  const allowedRole = state.user.rol === 'coordinador' || state.user.rol === 'seguridad';
+  const editableState = r.estado === STATUS.PEND || r.estado === STATUS.REJ;
+  return own && allowedRole && editableState;
+}
+
+function canArchiveRequisicion(r){
+  return !!state.user && state.user.rol === 'gerencia' && (r.estado === STATUS.APPR || r.estado === STATUS.REJ);
+}
+
 function renderReqCard(r, gerenciaActions, rhActions){
   return `
   <div class="req-card" data-id="${r.id}">
@@ -1101,6 +1204,7 @@ function renderReqCard(r, gerenciaActions, rhActions){
       <div class="detail-item"><div class="l">Correo solicitante</div><div class="v small">${r.solicitanteCorreo}</div></div>
       <div class="detail-item wide"><div class="l">Experiencia requerida</div><div class="v small">${r.experiencia}</div></div>
       ${r.aspectos ? `<div class="detail-item wide"><div class="l">Aspectos relevantes del cargo</div><div class="v small">${r.aspectos}</div></div>` : ''}
+      ${r.certificacionOMT ? `<div class="detail-item wide"><div class="l">Certificación OMT requerida</div><div class="v small">${r.certificacionOMT}</div></div>` : ''}
       ${r.comentarioGerencia ? `<div class="detail-item wide"><div class="l">Comentario de gerencia</div><div class="v small">${r.comentarioGerencia}</div></div>` : ''}
       ${r.clienteSolicito ? `
       <div class="detail-item wide">
@@ -1129,15 +1233,105 @@ function renderReqCard(r, gerenciaActions, rhActions){
         <button class="btn btn-success btn-sm close-vacancy-btn" data-id="${r.id}">✓ Marcar vacante cubierta</button>
       </div>
     ` : ''}
+    ${canDeleteRequisicion(r) ? `
+      <div class="req-actions" style="justify-content:flex-end;">
+        <button class="btn btn-danger btn-sm delete-req-btn" data-id="${r.id}">🗑 Eliminar requisición</button>
+      </div>
+    ` : ''}
+    ${canArchiveRequisicion(r) ? `
+      <div class="req-actions" style="justify-content:flex-end;">
+        <button class="btn btn-danger btn-sm archive-req-btn" data-id="${r.id}">🗑 Eliminar de historial</button>
+      </div>
+    ` : ''}
   </div>`;
+}
+
+/* ============================================================
+   SECURITY MODULE
+   ============================================================ */
+function securityPageHead(title, sub){
+  return `<div class="page-head">
+    <div><h1>${title}</h1><div class="sub">Seguridad INLOTRANS · ${sub || todayLabel()}</div></div>
+    <div class="page-head-actions"><button class="btn btn-ghost btn-sm" id="refresh-btn">${state.loading ? '<span class="spin"></span>' : '↻'} Actualizar</button></div>
+  </div>`;
+}
+
+function renderSecurityDashboard(stats){
+  const ops = OPERACIONES.filter(o=>o.name !== 'Seguridad');
+  return `${securityPageHead('Panel de Seguridad','Control operativo y seguimiento')}
+    ${stats}
+    <div class="security-grid">
+      <div class="card security-card">
+        <div class="security-icon">🛡</div>
+        <h3>Control de seguridad</h3>
+        <p>Panel independiente para centralizar seguimiento, novedades, incidentes y controles de seguridad de INLOTRANS.</p>
+         <div style="margin-top:18px; display:flex; gap:10px; flex-wrap:wrap;"><button class="btn btn-primary" id="security-req-btn" style="width:auto;">+ Nueva requisición</button><span class="hint" style="align-self:center;">Para Seguridad, el cargo se completa automáticamente como AUXILIAR DE PREVENCION DE PERDIDAS.</span></div>
+        <div class="security-list">
+          <div><span>✓</span> Monitoreo de operaciones</div>
+          <div><span>✓</span> Seguimiento de novedades</div>
+          <div><span>✓</span> Registro de incidentes</div>
+          <div><span>✓</span> Trazabilidad histórica</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-head"><div><h3>Operaciones monitoreadas</h3><div class="muted">${ops.length} operaciones activas en el catálogo</div></div></div>
+        <div class="security-ops">${ops.map(o=>`<div class="security-op"><span class="op-dot"></span><div><b>${o.name}</b><small>${o.code}</small></div></div>`).join('')}</div>
+      </div>
+    </div>`;
+}
+
+
+function renderSecurityReports(){
+  return `${securityPageHead('Reportes de seguridad','Consolidado para consulta')}
+    <div class="security-grid">
+      <div class="card"><h3>Reportes disponibles</h3>
+        <div class="security-report-item"><div><b>Reporte operativo</b><span>Consulta general de operaciones y actividad registrada.</span></div><button class="btn btn-ghost btn-sm" data-security-action="operativo">Consultar</button></div>
+        <div class="security-report-item"><div><b>Reporte de novedades</b><span>Consolidado de novedades e incidentes de seguridad.</span></div><button class="btn btn-ghost btn-sm" data-security-action="novedades">Consultar</button></div>
+        <div class="security-report-item"><div><b>Reporte de trazabilidad</b><span>Histórico de actividad disponible en el sistema.</span></div><button class="btn btn-ghost btn-sm" data-security-action="trazabilidad">Consultar</button></div>
+      </div>
+      <div class="card security-highlight"><div class="security-icon">📊</div><h3>Centro de control</h3><p>Este módulo queda separado de la aprobación. Seguridad puede crear requisiciones para el perfil AUXILIAR DE PREVENCION DE PERDIDAS y enviarlas a Gerencia para aprobación.</p></div>
+    </div>`;
+}
+
+function renderSecurityIncidents(){
+  return `${securityPageHead('Novedades / incidentes','Registro y seguimiento')}
+    <div class="card">
+      <div class="section-head"><div><h3>Registro de novedades</h3><div class="muted">Módulo preparado para centralizar incidentes de seguridad.</div></div></div>
+      <div class="incident-grid">
+        <div class="incident-type"><span>🚨</span><b>Incidente</b><small>Eventos de seguridad que requieren seguimiento.</small></div>
+        <div class="incident-type"><span>⚠️</span><b>Novedad</b><small>Alertas o situaciones operativas para registrar.</small></div>
+        <div class="incident-type"><span>🔎</span><b>Seguimiento</b><small>Casos abiertos pendientes de cierre.</small></div>
+      </div>
+      <div class="security-empty"><div class="security-empty-icon">🛡</div><b>Sin novedades cargadas</b><span>Cuando conectemos este módulo con el registro de seguridad, aquí aparecerán los casos y su estado.</span></div>
+    </div>`;
+}
+
+function renderSecurityHistory(){
+  const rows = state.requisiciones.filter(r=>r.solicitanteUsuario===state.user.usuario).slice().sort((a,b)=>new Date(b.fechaSolicitud)-new Date(a.fechaSolicitud)).slice(0,10);
+  return `${securityPageHead('Historial de seguridad','Trazabilidad del sistema')}
+    <div class="card"><h3>Actividad registrada</h3><div class="muted security-note">Consulta y seguimiento de requisiciones solicitadas por Seguridad.</div>
+      ${rows.length ? rows.map(r=>`<div class="security-history-row"><div><b>${r.cargo || 'Requisición'}</b><span>${r.operacionNombre || r.operacion || 'Operación'} · ${fmtDate(r.fechaSolicitud)}</span></div><span class="status-pill">${r.estado || 'Registrada'}</span></div>`).join('') : emptyState('Aún no hay registros disponibles.')}
+    </div>`;
 }
 
 /* ============================================================
    MAIN EVENTS
    ============================================================ */
 function attachMainEvents(){
+  document.querySelectorAll('[data-security-action]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const action = btn.dataset.securityAction;
+      const labels = {operativo:'Reporte operativo', novedades:'Reporte de novedades', trazabilidad:'Reporte de trazabilidad'};
+      showToast((labels[action] || 'Reporte') + ' listo para conexión con datos.');
+    });
+  });
+
   const refreshBtn = document.getElementById('refresh-btn');
   if(refreshBtn) refreshBtn.addEventListener('click', async ()=>{ await loadRequisiciones(); render(); });
+
+  const securityReqBtn = document.getElementById('security-req-btn');
+  if(securityReqBtn) securityReqBtn.addEventListener('click', ()=>{ pendingCaptura = null; state.view='nueva'; render(); });
+
 
   const newBtn = document.getElementById('dash-new-btn');
   if(newBtn) newBtn.addEventListener('click', ()=>{ pendingCaptura = null; state.view='nueva'; render(); });
@@ -1193,6 +1387,7 @@ function attachMainEvents(){
 
     form.addEventListener('submit', async (e)=>{
       e.preventDefault();
+      e.stopPropagation();
 
       const clienteCheckboxEl = document.getElementById('f-cliente-solicito');
       const clienteSolicito = clienteCheckboxEl ? clienteCheckboxEl.checked : false;
@@ -1218,11 +1413,12 @@ function attachMainEvents(){
         operacionCode: state.user.operacionCode,
         operacionNombre: state.user.operacionNombre,
         ciudad: document.getElementById('f-ciudad').value,
-        cargo: document.getElementById('f-cargo').value,
+        cargo: state.user.rol==='seguridad' ? 'AUXILIAR DE PREVENCION DE PERDIDAS' : document.getElementById('f-cargo').value,
         vacantes: parseInt(document.getElementById('f-vacantes').value || '1'),
         experiencia: document.getElementById('f-experiencia').value.trim(),
         fechaIngreso: document.getElementById('f-fecha-ingreso').value,
         aspectos: document.getElementById('f-aspectos').value.trim(),
+        certificacionOMT: '',
         motivo: document.getElementById('f-motivo').value,
         solicitanteUsuario: state.user.usuario,
         solicitanteNombre: state.user.nombre.replace(/^Coordinador — /,''),
@@ -1241,16 +1437,17 @@ function attachMainEvents(){
         if(result && result.ok){
           pendingCaptura = null;
           showToast(`Requisición #${result.consecutivo} enviada a Gerencia.`);
-          await loadRequisiciones();
           state.view = 'mis';
           render();
+          // Actualiza el historial sin sacar al usuario de la plataforma.
+          loadRequisiciones().then(()=>{ if(state.user && state.view==='mis') render(); }).catch(()=>{});
         } else {
-          showToast('No se pudo enviar la requisición. Intenta de nuevo.', true);
+          showToast((result && result.message) ? result.message : 'No se pudo enviar la requisición. Verifica que el Apps Script esté actualizado.', true);
           submitBtn.disabled = false;
           submitBtn.textContent = 'Enviar a Gerencia';
         }
       }catch(err){
-        showToast('Error de conexión al enviar la requisición.', true);
+        showToast('Error de conexión al enviar la requisición. Verifica la URL del Apps Script y los permisos de acceso.', true);
         submitBtn.disabled = false;
         submitBtn.textContent = 'Enviar a Gerencia';
       }
@@ -1280,6 +1477,69 @@ function attachMainEvents(){
   });
   document.querySelectorAll('.close-vacancy-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>updateEstado(btn.dataset.id, STATUS.DONE, 'Vacante cubierta por RH'));
+  });
+  document.querySelectorAll('.archive-req-btn').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const req = state.requisiciones.find(r=>String(r.id)===String(btn.dataset.id));
+      if(!req || !canArchiveRequisicion(req)) return;
+      const ref = req.consecutivo ? `REQ-${req.consecutivo}` : 'esta requisición';
+      if(!confirm(`¿Retirar ${ref} del historial operativo?\n\nLa requisición NO se borrará de Google Sheets: quedará archivada y podrá consultarse en “Eliminadas / Archivadas”.`)) return;
+      btn.disabled = true;
+      btn.textContent = 'Archivando…';
+      try{
+        const res = await apiUpdateEstado({
+          id:req.id,
+          estado:STATUS.ARCH,
+          comentarioGerencia:((req.comentarioGerencia || '') + (req.comentarioGerencia ? ' | ' : '') + 'Archivada por Gerencia el ' + todayISO()).trim(),
+          fecha:todayISO(),
+          accionTxt:'Requisición archivada por Gerencia',
+          usuario:state.user.nombre.replace(/^Coordinador — /,'')
+        });
+        if(res && res.ok){
+          showToast(`${ref} archivada correctamente.`);
+          await loadRequisiciones();
+          state.view='historial';
+          render();
+        }else{
+          showToast((res && res.message) || 'No se pudo archivar la requisición.', true);
+          btn.disabled=false; btn.textContent='🗑 Eliminar de historial';
+        }
+      }catch(err){
+        showToast('Error de conexión al archivar. Verifica el Apps Script.', true);
+        btn.disabled=false; btn.textContent='🗑 Eliminar de historial';
+      }
+    });
+  });
+
+  document.querySelectorAll('.delete-req-btn').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const req = state.requisiciones.find(r=>String(r.id)===String(btn.dataset.id));
+      if(!req || !canDeleteRequisicion(req)) return;
+      const ref = req.consecutivo ? `REQ-${req.consecutivo}` : 'esta requisición';
+      if(!confirm(`¿Eliminar ${ref} de forma permanente?\n\nEsta acción no se puede deshacer.`)) return;
+      btn.disabled = true;
+      btn.textContent = 'Eliminando…';
+      try{
+        const res = await apiDeleteRequisicion({
+          id:req.id,
+          solicitanteUsuario:state.user.usuario,
+          solicitanteRol:state.user.rol,
+          usuario:state.user.usuario,
+          fecha:todayISO()
+        });
+        if(res && res.ok){
+          showToast(`${ref} eliminada correctamente.`);
+          await loadRequisiciones();
+          render();
+        }else{
+          showToast((res && res.message) || 'No se pudo eliminar la requisición.', true);
+          btn.disabled=false; btn.textContent='🗑 Eliminar requisición';
+        }
+      }catch(err){
+        showToast('Error de conexión al eliminar. Verifica el Apps Script.', true);
+        btn.disabled=false; btn.textContent='🗑 Eliminar requisición';
+      }
+    });
   });
 }
 
