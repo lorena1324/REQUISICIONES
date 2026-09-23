@@ -269,6 +269,7 @@ h1,h2,h3,.display{
 .badge.proc{background:var(--process-bg); color:var(--process);}
 .badge.done{background:var(--success-bg); color:var(--success);}
 .badge.cliente{background:var(--process-bg); color:var(--process);}
+.badge.canc{background:var(--danger-bg); color:var(--danger);}
 
 .req-details{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; padding:14px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); margin:14px 0;}
 .detail-item .l{font-size:10.5px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.05em; font-weight:700;}
@@ -277,7 +278,7 @@ h1,h2,h3,.display{
 .detail-item .v.small{font-weight:400; font-size:13px; color:var(--ink-soft);}
 .captura-thumb{max-width:220px; max-height:150px; border-radius:8px; border:1px solid var(--line); margin-top:8px; display:block; cursor:pointer;}
 
-.pipe{display:flex; align-items:center; gap:0; margin-bottom:6px;}
+.pipe{display:flex; align-items:center; gap:0; margin-bottom:6px; flex-wrap:wrap;}
 .pipe-step{
   font-size:10px; font-weight:700; letter-spacing:.03em; text-transform:uppercase;
   padding:5px 12px 5px 10px; color:var(--ink-faint); background:#F1F2F5;
@@ -287,6 +288,7 @@ h1,h2,h3,.display{
 .pipe-step.on{background:var(--accent); color:#fff;}
 .pipe-step.done{background:#2E3B58; color:#fff;}
 .pipe-step.rejected{background:var(--danger); color:#fff;}
+.pipe-date{font-size:9.5px;color:var(--ink-faint);font-family:'JetBrains Mono';margin-top:2px;}
 
 .req-actions{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;}
 .reject-box{margin-top:12px; display:none;}
@@ -362,6 +364,28 @@ h1,h2,h3,.display{
 .status-pill{padding:5px 9px;border-radius:20px;background:var(--info-bg);color:var(--info);font-size:10px;font-weight:700;white-space:nowrap;}
 @media(max-width:900px){.security-grid{grid-template-columns:1fr}.incident-grid{grid-template-columns:1fr}.security-list{grid-template-columns:1fr}.security-ops{grid-template-columns:1fr}}
 
+/* ============================================================
+   FILTER BAR + RH STATS
+   ============================================================ */
+.filter-bar{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+  padding:16px 18px; margin-bottom:20px; display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;
+}
+.filter-field{min-width:150px; flex:1;}
+.filter-field label{
+  display:block; font-size:10px; font-weight:700; color:var(--ink-faint);
+  text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px;
+}
+.filter-field select,.filter-field input{
+  width:100%; padding:9px 10px; border:1.5px solid var(--line); border-radius:7px;
+  font-size:13px; font-family:'Inter'; color:var(--ink); background:#fff;
+}
+.filter-clear-btn{white-space:nowrap;}
+.excel-btn{white-space:nowrap;}
+.mini-badge{
+  display:inline-block; padding:3px 9px; border-radius:20px; font-size:10.5px; font-weight:700;
+  background:#F1F2F5; color:var(--ink-soft); margin-right:6px; margin-top:4px;
+}
 </style>
 </head>
 <body>
@@ -645,6 +669,9 @@ const MOTIVOS = [
   'Otro',
 ];
 
+const GENEROS = ['Indistinto','Hombres','Mujeres'];
+const TURNOS = ['Diurno','Nocturno','Rotativo','Fijo domingo a domingo con descanso entre semana','Fin de semana'];
+
 const CIUDADES = ['Bogotá D.C.','Agua de Dios','Albán','Anapoima','Anolaima','Apulo','Arbeláez','Beltrán','Bituima','Bojacá','Cabrera','Cachipay','Cajicá','Caparrapí','Cáqueza','Carmen de Carupa','Chaguaní','Chía','Chipaque','Choachí','Chocontá','Cogua','Cota','Cucunubá','El Colegio','El Peñón','El Rosal','Facatativá','Fómeque','Fosca','Funza','Fúquene','Fusagasugá','Gachalá','Gachancipá','Gachetá','Gama','Girardot','Granada','Guachetá','Guaduas','Guasca','Guataquí','Guatavita','Guayabal de Síquima','Guayabetal','Gutiérrez','Jerusalén','Junín','La Calera','La Mesa','La Palma','La Peña','La Vega','Lenguazaque','Machetá','Madrid','Manta','Medina','Mosquera','Nariño','Nemocón','Nilo','Nimaima','Nocaima','Pacho','Paime','Pandi','Paratebueno','Pasca','Puerto Salgar','Pulí','Quebradanegra','Quetame','Quipile','Ricaurte','San Antonio del Tequendama','San Bernardo','San Cayetano','San Francisco','San Juan de Rioseco','Sasaima','Sesquilé','Sibaté','Silvania','Simijaca','Soacha','Sopó','Subachoque','Suesca','Supatá','Susa','Sutatausa','Tabio','Tausa','Tena','Tenjo','Tibacuy','Tibirita','Tocaima','Tocancipá','Topaipí','Ubalá','Ubaque','Ubaté','Une','Útica','Venecia','Vergara','Vianí','Villagómez','Villapinzón','Villeta','Viotá','Yacopí','Zipacón','Zipaquirá','Girón (Santander)','Bucaramanga (Santander)','Buga (Valle del Cauca)','Barranquilla (Atlántico)'];
 
 const STATUS = {
@@ -653,6 +680,7 @@ const STATUS = {
   REJ:'Rechazada',
   PROC:'En Proceso de Búsqueda',
   DONE:'Vacante Cubierta',
+  CANC:'Cancelada por Coordinador',
   ARCH:'Archivada',
 };
 
@@ -667,6 +695,7 @@ let state = {
   loaded:false,
   loading:false,
   loginError:'',
+  filtros:{ operacion:'', genero:'', cargo:'' },
 };
 
 /* Captura temporal (evidencia de solicitud del cliente) mientras se llena el formulario */
@@ -723,7 +752,9 @@ async function apiDeleteRequisicion(payload){
 }
 
 function fmtDate(d){
+  if(!d) return '—';
   const dt = new Date(d);
+  if(isNaN(dt.getTime())) return '—';
   return dt.toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'});
 }
 function todayISO(){ return new Date().toISOString().slice(0,10); }
@@ -969,7 +1000,7 @@ function renderMain(){
   if(role==='rh'){
     if(state.view==='iniciar') return renderListado(state.requisiciones.filter(r=>r.estado===STATUS.APPR), 'Para iniciar búsqueda', 'Requisiciones aprobadas por gerencia, listas para iniciar selección.', false, true);
     if(state.view==='proceso') return renderListado(state.requisiciones.filter(r=>r.estado===STATUS.PROC), 'En proceso de búsqueda', 'Vacantes que RH está gestionando actualmente.', false, true);
-    if(state.view==='historial') return renderListado(state.requisiciones.filter(r=>r.estado!==STATUS.ARCH), 'Historial general', 'Todas las requisiciones activas y finalizadas del sistema.');
+    if(state.view==='historial') return renderListado(state.requisiciones.filter(r=>r.estado!==STATUS.ARCH), 'Historial general', 'Todas las requisiciones activas y finalizadas del sistema.', false, false, true);
     if(state.view==='archivadas') return renderListado(state.requisiciones.filter(r=>r.estado===STATUS.ARCH), 'Eliminadas / Archivadas', 'Requisiciones que Gerencia decidió retirar del historial operativo.');
   }
   if(role==='seguridad'){
@@ -993,6 +1024,7 @@ function renderDashboard(){
     proc: all.filter(r=>r.estado===STATUS.PROC).length,
     done: all.filter(r=>r.estado===STATUS.DONE).length,
     rej: all.filter(r=>r.estado===STATUS.REJ).length,
+    canc: all.filter(r=>r.estado===STATUS.CANC).length,
   };
   let stats = '';
   if(role==='coordinador'){
@@ -1002,6 +1034,7 @@ function renderDashboard(){
         <div class="stat-card accent"><div class="n">${mine.filter(r=>r.estado===STATUS.PEND).length}</div><div class="l">Pendientes de gerencia</div></div>
         <div class="stat-card"><div class="n">${mine.filter(r=>r.estado===STATUS.PROC||r.estado===STATUS.APPR).length}</div><div class="l">En búsqueda por RH</div></div>
         <div class="stat-card"><div class="n">${mine.filter(r=>r.estado===STATUS.DONE).length}</div><div class="l">Vacantes cubiertas</div></div>
+        <div class="stat-card"><div class="n">${mine.filter(r=>r.estado===STATUS.CANC).length}</div><div class="l">Canceladas por mí</div></div>
       </div>`;
   } else if(role==='seguridad'){
     const securityOps = OPERACIONES.filter(o=>o.name !== 'Seguridad').length;
@@ -1021,14 +1054,25 @@ function renderDashboard(){
         <div class="stat-card"><div class="n">${counts.appr+counts.proc}</div><div class="l">En gestión de RH</div></div>
         <div class="stat-card"><div class="n">${counts.done}</div><div class="l">Cubiertas</div></div>
         <div class="stat-card"><div class="n">${counts.rej}</div><div class="l">Rechazadas</div></div>
+        <div class="stat-card"><div class="n">${counts.canc}</div><div class="l">Canceladas</div></div>
       </div>`;
   } else {
+    const solicitadas = sumVacantes(all);
+    const canceladas = sumVacantes(all.filter(r=>r.estado===STATUS.CANC));
+    const cubiertas = sumVacantes(all.filter(r=>r.estado===STATUS.DONE));
+    const netas = solicitadas - canceladas;
     stats = `
       <div class="stat-row">
         <div class="stat-card accent"><div class="n">${counts.appr}</div><div class="l">Por iniciar búsqueda</div></div>
         <div class="stat-card"><div class="n">${counts.proc}</div><div class="l">En proceso</div></div>
         <div class="stat-card"><div class="n">${counts.done}</div><div class="l">Cubiertas</div></div>
         <div class="stat-card"><div class="n">${counts.pend}</div><div class="l">Pendientes en gerencia</div></div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-card"><div class="n">${solicitadas}</div><div class="l">Vacantes solicitadas (total)</div></div>
+        <div class="stat-card"><div class="n">${canceladas}</div><div class="l">Vacantes canceladas</div></div>
+        <div class="stat-card accent"><div class="n">${netas}</div><div class="l">Vacantes netas a cubrir</div></div>
+        <div class="stat-card"><div class="n">${cubiertas}</div><div class="l">Vacantes ya cubiertas</div></div>
       </div>`;
   }
 
@@ -1052,6 +1096,9 @@ function renderDashboard(){
       ${recent.length===0 ? emptyState('Aún no hay requisiciones registradas.') : recent.map(r=>reqSummaryRow(r)).join('')}
     </div>
   `;
+}
+function sumVacantes(list){
+  return list.reduce((acc,r)=> acc + (parseInt(r.vacantes,10) || 0), 0);
 }
 function todayLabel(){
   return new Date().toLocaleDateString('es-CO',{weekday:'long', day:'2-digit', month:'long', year:'numeric'});
@@ -1107,6 +1154,25 @@ function renderNuevaRequisicion(){
             <label>N° de vacantes</label>
             <input type="number" id="f-vacantes" min="1" value="1" required>
           </div>
+          <div class="field">
+            <label>Género requerido</label>
+            <select id="f-genero" required>${GENEROS.map(g=>`<option value="${g}">${g}</option>`).join('')}</select>
+          </div>
+          <div class="field">
+            <label>Turno</label>
+            <select id="f-turno" required>
+              <option value="">Selecciona un turno…</option>
+              ${TURNOS.map(t=>`<option value="${t}">${t}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field">
+            <label>Horario</label>
+            <input type="text" id="f-horario" placeholder="Ej. 6:00 a.m. – 2:00 p.m." required>
+          </div>
+          <div class="field">
+            <label>Lugar de trabajo</label>
+            <input type="text" id="f-lugar" placeholder="Ej. Bodega Funza, Zona Franca..." required>
+          </div>
           <div class="field span2">
             <label>Experiencia requerida <span style="font-weight:400;text-transform:none;color:var(--ink-faint);">(se llena automáticamente al elegir el cargo)</span></label>
             <textarea id="f-experiencia" rows="3" required>${esSeguridad ? compInicial.experiencia : ''}</textarea>
@@ -1159,8 +1225,52 @@ function renderNuevaRequisicion(){
 }
 
 /* ---------- LISTADO (usado por varios roles) ---------- */
-function renderListado(list, title, subtitle, gerenciaActions=false, rhActions=false){
-  const sorted = [...list].sort((a,b)=> new Date(b.fechaSolicitud)-new Date(a.fechaSolicitud));
+function applyFiltros(list){
+  const f = state.filtros;
+  return list.filter(r=>{
+    if(f.operacion && r.operacionCode !== f.operacion) return false;
+    if(f.genero && r.genero !== f.genero) return false;
+    if(f.cargo && r.cargo !== f.cargo) return false;
+    return true;
+  });
+}
+
+function renderFilterBar(showExcel){
+  const f = state.filtros;
+  return `
+  <div class="filter-bar">
+    <div class="filter-field">
+      <label>Operación</label>
+      <select id="filtro-operacion">
+        <option value="">Todas</option>
+        ${OPERACIONES.filter(o=>o.code!=='TODAS').map(o=>`<option value="${o.code}" ${f.operacion===o.code?'selected':''}>${o.name}</option>`).join('')}
+      </select>
+    </div>
+    <div class="filter-field">
+      <label>Género</label>
+      <select id="filtro-genero">
+        <option value="">Todos</option>
+        ${GENEROS.map(g=>`<option value="${g}" ${f.genero===g?'selected':''}>${g}</option>`).join('')}
+      </select>
+    </div>
+    <div class="filter-field">
+      <label>Cargo</label>
+      <select id="filtro-cargo">
+        <option value="">Todos</option>
+        ${CARGOS.map(c=>`<option value="${c}" ${f.cargo===c?'selected':''}>${c}</option>`).join('')}
+      </select>
+    </div>
+    <button class="btn btn-ghost btn-sm filter-clear-btn" id="filtro-limpiar-btn">Limpiar filtros</button>
+    ${showExcel ? `<button class="btn btn-success btn-sm excel-btn" id="excel-export-btn">⬇ Descargar Excel</button>` : ''}
+  </div>`;
+}
+
+function renderListado(list, title, subtitle, gerenciaActions=false, rhActions=false, showFiltrosRH=false){
+  const filtered = applyFiltros(list);
+  const sorted = [...filtered].sort((a,b)=> new Date(b.fechaSolicitud)-new Date(a.fechaSolicitud));
+  const solicitadas = sumVacantes(filtered);
+  const canceladas = sumVacantes(filtered.filter(r=>r.estado===STATUS.CANC));
+  const cubiertas = sumVacantes(filtered.filter(r=>r.estado===STATUS.DONE));
   return `
     <div class="page-head">
       <div><h1>${title}</h1><div class="sub">${subtitle}</div></div>
@@ -1168,6 +1278,15 @@ function renderListado(list, title, subtitle, gerenciaActions=false, rhActions=f
         <button class="btn btn-ghost btn-sm" id="refresh-btn">${state.loading ? '<span class="spin"></span>' : '↻'} Actualizar</button>
       </div>
     </div>
+    ${showFiltrosRH ? renderFilterBar(true) : ''}
+    ${showFiltrosRH ? `
+      <div class="stat-row">
+        <div class="stat-card"><div class="n">${filtered.length}</div><div class="l">Requisiciones (consecutivo)</div></div>
+        <div class="stat-card"><div class="n">${solicitadas}</div><div class="l">Vacantes solicitadas</div></div>
+        <div class="stat-card"><div class="n">${canceladas}</div><div class="l">Vacantes canceladas</div></div>
+        <div class="stat-card accent"><div class="n">${solicitadas-canceladas}</div><div class="l">Vacantes netas</div></div>
+        <div class="stat-card"><div class="n">${cubiertas}</div><div class="l">Vacantes cubiertas</div></div>
+      </div>` : ''}
     ${sorted.length===0 ? emptyState('No hay requisiciones en esta vista por el momento.') : sorted.map(r=>renderReqCard(r, gerenciaActions, rhActions)).join('')}
   `;
 }
@@ -1179,25 +1298,28 @@ function emptyState(msg){
 function badgeFor(estado){
   const map = {
     [STATUS.PEND]: 'pend', [STATUS.APPR]: 'appr', [STATUS.REJ]: 'rej',
-    [STATUS.PROC]: 'proc', [STATUS.DONE]: 'done',
+    [STATUS.PROC]: 'proc', [STATUS.DONE]: 'done', [STATUS.CANC]: 'canc',
   };
-  return `<span class="badge ${map[estado]}">${estado}</span>`;
+  return `<span class="badge ${map[estado]||'pend'}">${estado}</span>`;
 }
 
 function pipelineFor(r){
   const stageOrder = ['Solicitud','Aprobación','Búsqueda RH','Cubierta'];
+  const dateOrder = [r.fechaSolicitud, r.fechaAprobacion, r.fechaInicioBusqueda, r.fechaCierre];
   let activeIdx = 0;
   if(r.estado===STATUS.PEND) activeIdx=1;
   else if(r.estado===STATUS.APPR) activeIdx=2;
   else if(r.estado===STATUS.PROC) activeIdx=2;
   else if(r.estado===STATUS.DONE) activeIdx=4;
   const rejected = r.estado===STATUS.REJ;
+  const cancelada = r.estado===STATUS.CANC;
   return `<div class="pipe">${stageOrder.map((s,i)=>{
     let cls='';
-    if(rejected && i===1) cls='rejected';
+    if((rejected||cancelada) && i===1) cls='rejected';
     else if(i < activeIdx) cls='done';
     else if(i === activeIdx) cls='on';
-    return `<div class="pipe-step ${cls}">${s}</div>`;
+    const d = dateOrder[i];
+    return `<div><div class="pipe-step ${cls}">${s}</div>${d ? `<div class="pipe-date">${fmtDate(d)}</div>` : ''}</div>`;
   }).join('')}</div>`;
 }
 
@@ -1205,7 +1327,7 @@ function canDeleteRequisicion(r){
   if(!state.user) return false;
   // Gerencia puede retirar del historial operativo las requisiciones que ya decidió.
   if(state.user.rol === 'gerencia'){
-    return r.estado === STATUS.APPR || r.estado === STATUS.REJ;
+    return r.estado === STATUS.APPR || r.estado === STATUS.REJ || r.estado === STATUS.CANC;
   }
   // Se conserva la regla anterior para coordinadores/Seguridad.
   const own = r.solicitanteUsuario === state.user.usuario;
@@ -1215,7 +1337,15 @@ function canDeleteRequisicion(r){
 }
 
 function canArchiveRequisicion(r){
-  return !!state.user && state.user.rol === 'gerencia' && (r.estado === STATUS.APPR || r.estado === STATUS.REJ);
+  return !!state.user && state.user.rol === 'gerencia' && (r.estado === STATUS.APPR || r.estado === STATUS.REJ || r.estado === STATUS.CANC);
+}
+
+function canCancelRequisicion(r){
+  if(!state.user) return false;
+  const own = r.solicitanteUsuario === state.user.usuario;
+  const allowedRole = state.user.rol === 'coordinador' || state.user.rol === 'seguridad';
+  const cancelableState = r.estado === STATUS.PEND || r.estado === STATUS.APPR || r.estado === STATUS.PROC;
+  return own && allowedRole && cancelableState;
 }
 
 function renderReqCard(r, gerenciaActions, rhActions){
@@ -1226,6 +1356,12 @@ function renderReqCard(r, gerenciaActions, rhActions){
         <div class="req-id">REQ-${r.consecutivo} · Solicitada ${fmtDate(r.fechaSolicitud)}</div>
         <div class="req-title">${r.cargo} — ${r.operacionNombre} ${r.clienteSolicito ? '<span class="badge cliente">Pedido por cliente</span>' : ''}</div>
         <div class="req-sub">${r.ciudad} · ${r.vacantes} vacante(s) · Coordinador: ${r.solicitanteNombre} (${r.solicitanteCargo})</div>
+        <div style="margin-top:6px;">
+          ${r.genero ? `<span class="mini-badge">${r.genero}</span>` : ''}
+          ${r.turno ? `<span class="mini-badge">${r.turno}</span>` : ''}
+          ${r.horario ? `<span class="mini-badge">${r.horario}</span>` : ''}
+          ${r.lugar ? `<span class="mini-badge">${r.lugar}</span>` : ''}
+        </div>
       </div>
       ${badgeFor(r.estado)}
     </div>
@@ -1235,10 +1371,15 @@ function renderReqCard(r, gerenciaActions, rhActions){
       <div class="detail-item"><div class="l">Motivo</div><div class="v small">${r.motivo}</div></div>
       <div class="detail-item"><div class="l">Ingreso requerido</div><div class="v small">${fmtDate(r.fechaIngreso)}</div></div>
       <div class="detail-item"><div class="l">Correo solicitante</div><div class="v small">${r.solicitanteCorreo}</div></div>
+      <div class="detail-item"><div class="l">Fecha solicitud</div><div class="v small">${fmtDate(r.fechaSolicitud)}</div></div>
+      <div class="detail-item"><div class="l">Fecha aprobación</div><div class="v small">${fmtDate(r.fechaAprobacion)}</div></div>
+      <div class="detail-item"><div class="l">Inicio de búsqueda</div><div class="v small">${fmtDate(r.fechaInicioBusqueda)}</div></div>
+      <div class="detail-item"><div class="l">Fecha de cierre</div><div class="v small">${fmtDate(r.fechaCierre)}</div></div>
       <div class="detail-item wide"><div class="l">Experiencia requerida</div><div class="v small">${r.experiencia}</div></div>
       ${r.aspectos ? `<div class="detail-item wide"><div class="l">Aspectos relevantes del cargo</div><div class="v small">${r.aspectos}</div></div>` : ''}
       ${r.certificacionOMT ? `<div class="detail-item wide"><div class="l">Certificación OMT requerida</div><div class="v small">${r.certificacionOMT}</div></div>` : ''}
       ${r.comentarioGerencia ? `<div class="detail-item wide"><div class="l">Comentario de gerencia</div><div class="v small">${r.comentarioGerencia}</div></div>` : ''}
+      ${r.observacionCancelacion ? `<div class="detail-item wide"><div class="l">Observación de cancelación</div><div class="v small">${r.observacionCancelacion}</div></div>` : ''}
       ${r.clienteSolicito ? `
       <div class="detail-item wide">
         <div class="l">Solicitud del cliente</div>
@@ -1264,6 +1405,15 @@ function renderReqCard(r, gerenciaActions, rhActions){
     ${rhActions && r.estado===STATUS.PROC ? `
       <div class="req-actions">
         <button class="btn btn-success btn-sm close-vacancy-btn" data-id="${r.id}">✓ Marcar vacante cubierta</button>
+      </div>
+    ` : ''}
+    ${canCancelRequisicion(r) ? `
+      <div class="req-actions">
+        <button class="btn btn-danger btn-sm cancel-toggle-btn" data-id="${r.id}">✕ Cancelar vacante</button>
+      </div>
+      <div class="reject-box" id="cancel-box-${r.id}">
+        <textarea placeholder="Observación de la cancelación (obligatorio)" rows="2" id="cancel-reason-${r.id}" style="width:100%; padding:10px 12px; border:1.5px solid var(--line); border-radius:8px; font-family:'Inter'; font-size:13.5px; margin-top:4px;"></textarea>
+        <button class="btn btn-danger btn-sm confirm-cancel-btn" data-id="${r.id}" style="margin-top:8px;">Confirmar cancelación</button>
       </div>
     ` : ''}
     ${canDeleteRequisicion(r) ? `
@@ -1348,6 +1498,30 @@ function renderSecurityHistory(){
 }
 
 /* ============================================================
+   EXCEL EXPORT (CSV compatible con Excel, sin librerías externas)
+   ============================================================ */
+function exportToExcel(list){
+  const headers = ['Consecutivo','Operación','Cargo','Ciudad','Vacantes','Género','Turno','Horario','Lugar','Estado','Motivo','Coordinador','Correo Coordinador','Fecha Solicitud','Fecha Aprobación','Fecha Inicio Búsqueda','Fecha Cierre','Observación Cancelación','Comentario Gerencia'];
+  const rows = list.map(r=>[
+    r.consecutivo, r.operacionNombre, r.cargo, r.ciudad, r.vacantes, r.genero||'', r.turno||'', r.horario||'', r.lugar||'',
+    r.estado, r.motivo, r.solicitanteNombre, r.solicitanteCorreo,
+    fmtDate(r.fechaSolicitud), fmtDate(r.fechaAprobacion), fmtDate(r.fechaInicioBusqueda), fmtDate(r.fechaCierre),
+    r.observacionCancelacion||'', r.comentarioGerencia||''
+  ]);
+  const esc = v => `"${String(v===undefined||v===null?'':v).replace(/"/g,'""')}"`;
+  const csv = [headers.map(esc).join(';'), ...rows.map(row=>row.map(esc).join(';'))].join('\r\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'requisiciones_inlotrans_'+todayISO()+'.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* ============================================================
    MAIN EVENTS
    ============================================================ */
 function attachMainEvents(){
@@ -1368,6 +1542,21 @@ function attachMainEvents(){
 
   const newBtn = document.getElementById('dash-new-btn');
   if(newBtn) newBtn.addEventListener('click', ()=>{ pendingCaptura = null; state.view='nueva'; render(); });
+
+  /* Filtros (vista Historial general de RH) */
+  const filtroOp = document.getElementById('filtro-operacion');
+  if(filtroOp) filtroOp.addEventListener('change', ()=>{ state.filtros.operacion = filtroOp.value; render(); });
+  const filtroGen = document.getElementById('filtro-genero');
+  if(filtroGen) filtroGen.addEventListener('change', ()=>{ state.filtros.genero = filtroGen.value; render(); });
+  const filtroCargo = document.getElementById('filtro-cargo');
+  if(filtroCargo) filtroCargo.addEventListener('change', ()=>{ state.filtros.cargo = filtroCargo.value; render(); });
+  const filtroLimpiar = document.getElementById('filtro-limpiar-btn');
+  if(filtroLimpiar) filtroLimpiar.addEventListener('click', ()=>{ state.filtros = {operacion:'',genero:'',cargo:''}; render(); });
+  const excelBtn = document.getElementById('excel-export-btn');
+  if(excelBtn) excelBtn.addEventListener('click', ()=>{
+    const base = state.requisiciones.filter(r=>r.estado!==STATUS.ARCH);
+    exportToExcel(applyFiltros(base));
+  });
 
   const form = document.getElementById('nueva-req-form');
   if(form){
@@ -1454,6 +1643,10 @@ function attachMainEvents(){
         ciudad: document.getElementById('f-ciudad').value,
         cargo: state.user.rol==='seguridad' ? 'AUXILIAR DE PREVENCION DE PERDIDAS' : document.getElementById('f-cargo').value,
         vacantes: parseInt(document.getElementById('f-vacantes').value || '1'),
+        genero: document.getElementById('f-genero').value,
+        turno: document.getElementById('f-turno').value,
+        horario: document.getElementById('f-horario').value.trim(),
+        lugar: document.getElementById('f-lugar').value.trim(),
         experiencia: document.getElementById('f-experiencia').value.trim(),
         fechaIngreso: document.getElementById('f-fecha-ingreso').value,
         aspectos: document.getElementById('f-aspectos').value.trim(),
@@ -1496,7 +1689,7 @@ function attachMainEvents(){
   if(cancelBtn) cancelBtn.addEventListener('click', ()=>{ pendingCaptura = null; state.view='dashboard'; render(); });
 
   document.querySelectorAll('.approve-btn').forEach(btn=>{
-    btn.addEventListener('click', ()=>updateEstado(btn.dataset.id, STATUS.APPR, 'Aprobada por Gerencia'));
+    btn.addEventListener('click', ()=>updateEstado(btn.dataset.id, STATUS.APPR, 'Aprobada por Gerencia', undefined, {fechaAprobacion: todayISO()}));
   });
   document.querySelectorAll('.reject-toggle-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
@@ -1508,14 +1701,27 @@ function attachMainEvents(){
       const id = btn.dataset.id;
       const reason = document.getElementById('reject-reason-'+id).value.trim();
       if(!reason){ showToast('Escribe un motivo de rechazo.', true); return; }
-      await updateEstado(id, STATUS.REJ, 'Rechazada por Gerencia: '+reason, reason);
+      await updateEstado(id, STATUS.REJ, 'Rechazada por Gerencia: '+reason, reason, {fechaCierre: todayISO()});
+    });
+  });
+  document.querySelectorAll('.cancel-toggle-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.getElementById('cancel-box-'+btn.dataset.id).classList.toggle('show');
+    });
+  });
+  document.querySelectorAll('.confirm-cancel-btn').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const id = btn.dataset.id;
+      const reason = document.getElementById('cancel-reason-'+id).value.trim();
+      if(!reason){ showToast('Escribe la observación de la cancelación.', true); return; }
+      await updateEstado(id, STATUS.CANC, 'Vacante cancelada por el coordinador: '+reason, undefined, {fechaCierre: todayISO(), observacionCancelacion: reason});
     });
   });
   document.querySelectorAll('.start-search-btn').forEach(btn=>{
-    btn.addEventListener('click', ()=>updateEstado(btn.dataset.id, STATUS.PROC, 'RH inició la búsqueda de personal'));
+    btn.addEventListener('click', ()=>updateEstado(btn.dataset.id, STATUS.PROC, 'RH inició la búsqueda de personal', undefined, {fechaInicioBusqueda: todayISO()}));
   });
   document.querySelectorAll('.close-vacancy-btn').forEach(btn=>{
-    btn.addEventListener('click', ()=>updateEstado(btn.dataset.id, STATUS.DONE, 'Vacante cubierta por RH'));
+    btn.addEventListener('click', ()=>updateEstado(btn.dataset.id, STATUS.DONE, 'Vacante cubierta por RH', undefined, {fechaCierre: todayISO()}));
   });
   document.querySelectorAll('.archive-req-btn').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
@@ -1582,12 +1788,12 @@ function attachMainEvents(){
   });
 }
 
-async function updateEstado(id, nuevoEstado, accionTxt, comentario){
-  const payload = {
+async function updateEstado(id, nuevoEstado, accionTxt, comentario, extra){
+  const payload = Object.assign({
     id, estado: nuevoEstado,
     comentarioGerencia: comentario !== undefined ? comentario : undefined,
     fecha: todayISO(), accionTxt, usuario: state.user.nombre.replace(/^Coordinador — /,'')
-  };
+  }, extra || {});
   try{
     const res = await apiUpdateEstado(payload);
     if(res && res.ok){
