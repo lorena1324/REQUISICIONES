@@ -462,6 +462,7 @@ const OPERACIONES = [
   {code:'logisfashion', name:'Logisfashion'},
   {code:'SeguridadInlo', name:'Seguridad'},
   {code:'INTERPACK', name:'Interpack'},
+  {code:'ARDISA', name:'Ardisa'},
   {code:'TODAS', name:'TODAS'},
   
   
@@ -751,6 +752,9 @@ async function apiDeleteRequisicion(payload){
   return res.json();
 }
 
+function sameUser(a,b){
+  return String(a||'').trim().toLowerCase() === String(b||'').trim().toLowerCase();
+}
 function fmtDate(d){
   if(!d) return '—';
   const dt = new Date(d);
@@ -990,7 +994,7 @@ function renderMain(){
   if(state.view==='dashboard') return renderDashboard();
   if(role==='coordinador'){
     if(state.view==='nueva') return renderNuevaRequisicion();
-    if(state.view==='mis') return renderListado(state.requisiciones.filter(r=>r.solicitanteUsuario===state.user.usuario), 'Mis requisiciones', 'Historial de las requisiciones que has solicitado.');
+    if(state.view==='mis') return renderListado(state.requisiciones.filter(r=>sameUser(r.solicitanteUsuario, state.user.usuario)), 'Mis requisiciones', 'Historial de las requisiciones que has solicitado.');
   }
   if(role==='gerencia'){
     if(state.view==='pendientes') return renderListado(state.requisiciones.filter(r=>r.estado===STATUS.PEND), 'Pendientes de aprobación', 'Requisiciones esperando tu decisión.', true);
@@ -1005,7 +1009,7 @@ function renderMain(){
   }
   if(role==='seguridad'){
     if(state.view==='nueva') return renderNuevaRequisicion();
-    if(state.view==='mis') return renderListado(state.requisiciones.filter(r=>r.solicitanteUsuario===state.user.usuario), 'Mis requisiciones', 'Requisiciones solicitadas por Seguridad.');
+    if(state.view==='mis') return renderListado(state.requisiciones.filter(r=>sameUser(r.solicitanteUsuario, state.user.usuario)), 'Mis requisiciones', 'Requisiciones solicitadas por Seguridad.');
     if(state.view==='reportes') return renderSecurityReports();
     if(state.view==='novedades') return renderSecurityIncidents();
     if(state.view==='historial') return renderSecurityHistory();
@@ -1017,7 +1021,7 @@ function renderMain(){
 function renderDashboard(){
   const role = state.user.rol;
   const all = state.requisiciones.filter(r=>r.estado!==STATUS.ARCH);
-  const mine = all.filter(r=>r.solicitanteUsuario===state.user.usuario);
+  const mine = all.filter(r=>sameUser(r.solicitanteUsuario, state.user.usuario));
   const counts = {
     pend: all.filter(r=>r.estado===STATUS.PEND).length,
     appr: all.filter(r=>r.estado===STATUS.APPR).length,
@@ -1330,7 +1334,7 @@ function canDeleteRequisicion(r){
     return r.estado === STATUS.APPR || r.estado === STATUS.REJ || r.estado === STATUS.CANC;
   }
   // Se conserva la regla anterior para coordinadores/Seguridad.
-  const own = r.solicitanteUsuario === state.user.usuario;
+  const own = sameUser(r.solicitanteUsuario, state.user.usuario);
   const allowedRole = state.user.rol === 'coordinador' || state.user.rol === 'seguridad';
   const editableState = r.estado === STATUS.PEND || r.estado === STATUS.REJ;
   return own && allowedRole && editableState;
@@ -1340,11 +1344,16 @@ function canArchiveRequisicion(r){
   return !!state.user && state.user.rol === 'gerencia' && (r.estado === STATUS.APPR || r.estado === STATUS.REJ || r.estado === STATUS.CANC);
 }
 
+/* Cancelable por el coordinador/seguridad que la solicitó, en cualquier estado
+   que todavía no sea un cierre definitivo (rechazada, cubierta, ya cancelada
+   o archivada). Se usa .includes en vez de comparar estado por estado para
+   que un texto de estado inesperado que venga del backend no bloquee el botón. */
 function canCancelRequisicion(r){
   if(!state.user) return false;
-  const own = r.solicitanteUsuario === state.user.usuario;
+  const own = sameUser(r.solicitanteUsuario, state.user.usuario);
   const allowedRole = state.user.rol === 'coordinador' || state.user.rol === 'seguridad';
-  const cancelableState = r.estado === STATUS.PEND || r.estado === STATUS.APPR || r.estado === STATUS.PROC;
+  const estadosCerrados = [STATUS.REJ, STATUS.DONE, STATUS.CANC, STATUS.ARCH];
+  const cancelableState = r.estado && !estadosCerrados.includes(r.estado);
   return own && allowedRole && cancelableState;
 }
 
@@ -1714,7 +1723,11 @@ function attachMainEvents(){
       const id = btn.dataset.id;
       const reason = document.getElementById('cancel-reason-'+id).value.trim();
       if(!reason){ showToast('Escribe la observación de la cancelación.', true); return; }
-      await updateEstado(id, STATUS.CANC, 'Vacante cancelada por el coordinador: '+reason, undefined, {fechaCierre: todayISO(), observacionCancelacion: reason});
+      const req = state.requisiciones.find(r=>String(r.id)===String(id));
+      if(!req || !canCancelRequisicion(req)){ showToast('Esta requisición ya no se puede cancelar.', true); return; }
+      btn.disabled = true;
+      btn.textContent = 'Cancelando…';
+      await updateEstado(id, STATUS.CANC, 'Vacante cancelada por el coordinador: '+reason, undefined, {fechaCierre: todayISO(), observacionCancelacion: reason}, btn, 'Confirmar cancelación');
     });
   });
   document.querySelectorAll('.start-search-btn').forEach(btn=>{
@@ -1788,7 +1801,7 @@ function attachMainEvents(){
   });
 }
 
-async function updateEstado(id, nuevoEstado, accionTxt, comentario, extra){
+async function updateEstado(id, nuevoEstado, accionTxt, comentario, extra, btn, btnOriginalText){
   const payload = Object.assign({
     id, estado: nuevoEstado,
     comentarioGerencia: comentario !== undefined ? comentario : undefined,
@@ -1801,10 +1814,18 @@ async function updateEstado(id, nuevoEstado, accionTxt, comentario, extra){
       await loadRequisiciones();
       render();
     } else {
-      showToast('No se pudo actualizar. Intenta de nuevo.', true);
+      /* Se muestra el motivo exacto que devuelva el backend (si lo trae) para
+         poder diagnosticar por qué el Apps Script rechazó el cambio de estado,
+         en vez de un mensaje genérico que no dice nada. */
+      const detalle = (res && (res.message || res.error)) ? (res.message || res.error) : 'El servidor respondió sin confirmar el cambio (revisa que el Apps Script acepte el estado "'+nuevoEstado+'").';
+      showToast('No se pudo actualizar: ' + detalle, true);
+      console.error('updateEstado falló', payload, res);
+      if(btn){ btn.disabled = false; btn.textContent = btnOriginalText || btn.textContent; }
     }
   }catch(err){
-    showToast('Error de conexión al actualizar.', true);
+    showToast('Error de conexión al actualizar: ' + (err && err.message ? err.message : err), true);
+    console.error('updateEstado error de red', payload, err);
+    if(btn){ btn.disabled = false; btn.textContent = btnOriginalText || btn.textContent; }
   }
 }
 
