@@ -372,7 +372,7 @@ h1,h2,h3,.display{
      página queda en blanco (parece que "el login no deja entrar"). Esto detecta
      ese caso y lo muestra en pantalla en vez de dejarlo mudo. -->
 <script>
-window.APP_VERSION = '2026.09.13';
+window.APP_VERSION = '2026.09.23';
 window.addEventListener('error', function(ev){
   var app = document.getElementById('app');
   if(!app || app.innerHTML.trim() !== '') return;
@@ -405,7 +405,7 @@ setTimeout(function(){
 /* ============================================================
    DATA / CONFIG
    ============================================================ */
-const LOGO_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAABpCAYAAAC9KChRAAA6uklEQVR42u19d5iU1fX/59z7lmlb6U2lKbAgKgiKKNhRKbZZe48lRqMmGo2JmZ1YYjRGibFrjLHvWBBRMSqyFiyIQYFVkSIdtpdpb7n3/P6YWVgQTcwvyXdX9zzPPsuzzM6+c+/nnvq55xB+0MI0aVKFrKqKKwC89afMwWsqZvWa/epHQ3oUFewZDIfK0pnkwrdfufZeAHT47XPO8ph+JYmbmEkSQCC4ilEXNERj0DSa0q7+NOOp6h9NHPLV6eOHbiIi1f7vRisTIhGNahDxD3kH6If4oWOxmIjH4wCgAcA0BA6Z9oc+jusd0tCUHSPA46QhhinFERDZQpjwPCcdCVqT33vj2oVjYrO7hwvE66FI4WjfSYNIAEQgImgQlGaw54AIGQG0uFp/bBliYViai/YeGnnn+ikTGvTWh2ERQwXi8bjuAuD3XqISqNQAsSDg8GP/2Mfz9ZF1ja3TTSkPUJp62nYQWvtgrfLKiRmAL6VtJpMtC3fbc8DkOfdfmJ5yx8v7pjW9aUkR0NonYhATMYFBIIAgQAIMgjRMQBpwUkkYgtYrzW/2KrRnmbb/6mNnHplqAyJQAfzAgPgDAWBMAHFuM7PTT//z+PVrGs9VWh8tDbO/lAJgBUCz1qyJiNqtTe47QwlpyYyT+u2Sd38bA4DJt835jRkMx1U2o4ggd2LiGQwwgcHEQkCyMCCkCc91wNqvDpjymUFFwafuOWvyZz9Ejfg9ByATUC6AhJKSMHTMtUfYpnkpEY4wraBFUNBa6RwwOWdHv+3NSLDrKcey+dCF82LvXXDv7NCyZpoXCYfHe05GE5H4Zw+UczHBgiDIMImFhJvJNIH10wT3z1VXnbAUAKKVlTJRXq7b+6ZdAOx05jahAODQqbfu25xyrvV9faxt2dDaAzOrbwMdUc74EtHWf4NZC2mKdCa9aLNJk2ur4slp97x6QEtGv2FKMlkr+icg3lE0GExSSmFacDOZpKv8v+7e3brlr+dOWZd3WMX32SzL76XWi1ZLVCfUsH2v6dZv4GE3pB3/LimtUVJoVsrXOc1IXwOfEDnLywxoZkgpkHU8ZLMelNJgBgnBShrBfhHP483rquYtf+mxdbseUh42g5EDte9rInyjFhREO6ozAkGw1qx9X0tDBOxgeFxdq3PywCNO8b9ydl+ER+IqWlkpqxMJ7tKAncPX0wCwz8TYVJ/FrbYdHAZ28xpv5weOiMDMyGQ9WKaEYUiAGRnHw9BBvXDGSfsBAO59aD621LdywLLYcX3fZXVo9bvxd34/67OC2ctXzA+Hw/v4bkYTtpliXzME5cDn+AqWlJCCwOCcVt3eZWQGaWkYUgsDvpOdFyD/qld/Nv1jxGICFRX8fUvbiO/NJ4lWSiCuf/7zv4WHj7/uj0xydjBgD2OVVcyadwQf5dMmzIDr+sg6HvYs6wfDEBgyqCceuvNsEICRw/sCDHz0j69w7hkTkUm7xKxhWZZlgWYOmfjLHlcfO7y1MGD91PfcJiJBYGZBhNash3MnDMVJYwahJeNiSI9CWIZA2vPh+vrrxpqIiCCV7zG8rLKDwUMyMOZNuHnW+SIe1yDiWCwmugDYEcGXKFf9hv906BsffjU3Ei64wjAIvu9pEMn2ppbyXprjeFBaQ2uN3Qf1xMzfnYw/3nASJuw7GJu3NGPUyP44+fhx+HDRahimzJllzTAMCQaE1p427OA+hiNngJlevvSI99j3lpFhEYhYaUbQlJg6ahcYkjB+YE/cfOxYOL7CgOIw+haF4HgaggiCaDtTlI/CpZ9NK1vKomA4cv+Bf3zpwV4//1s4Ho/raLRSdgGwg4FvyNhfTurerfs8y7QnMjs+M2Nn/pjSOdPXr08JwkELl//4MOwyoBt+P3MuqhYsh5QCAcvEa28swz577QIhBHr3KsSPz5uMz7/cDNfzIQSYiITnZFsG7db7IxDxcXe/diALYyz7LhOBHF9h115FIACSCFcfuSeWbGzE7j2LcOVhI3HWfkPRtziE1qyHlqwHxYydKESplM/wPWUFI+ft3rv0pXE3P9s/kShX3xcQiu8D+Ebu9+vySCD4UsC2+ivlKDCMHbVeW0RrmxIbNzXhwnMOwhU/ORwrVtVg/3GD8ebbXwAAWlMOTFOgpq4Vjqtw0nFjsax6I+56YB4OOWgYupWE4flaMwzYAfny3GcvXUwAGrPumWYgaLNmLYjI8RXG7todq+paMHmPPrANidc/24CTxw7C/e9+AUcp9C0K4rwDdsflh4wAIRegiHzUvb02ZMnZpB8MhyfZZvCNw26fMzyRKFfRys4Pwk4MwBz4Ru3/m1OkYT1mWUbY911NRHLHyFbrXA462ZrFzbETcPIJ++Lv86px3NR9sH5DI7p3i+DQA4fBtiRqalqwak0dJuw3BKwZuwzohj9etVj/L3+/O78ChE9nFmbE+2ci4Gs+HqSaGoyR3xwoQCXo6PzHzCzD5jZm4wKGl48Kk0+ky9y2m9CkyRmzZk1kJpqTiEYFOkhqqkMBAOr9Qhji/WdOKtF4ThJZM0mkR0AmsKMoIYlIC49MJptKZzMvEZG+f96V7wJAvKoq7v/PJTMTAJRcvOgvzTL9nJvJTIEmiZ0BUJIQMbFhSpjMcFPJTCLZ9OKfL7pAxJ966mmVSPz3zWn/1WV7d7uD0kbAlgUgMtn0rP99YloVAKB0d+MoZ0M6C6P3AGx5+DcYcvcSDL7rBQCA29CE3fKMYhPPz3rjBs9zzoxWVv7XLQz+2/L/AeIvvutn24EN3AAAAAElFTkSuQmCC";
+const LOGO_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAABpCAYAAAC9KChRAAA6uklEQVR42u19d5iU1fX/59z7lmlb6U2lKbAgKgiKKNhRKbZZe48lRqMmGo2JmZ1YYjRGibFrjLHvWBBRMSqyFiyIQYFVkSIdtpdpb7n3/P6YWVgQTcwvyXdX9zzPPsuzzM6+M/Of93POPR9O+w8+4X/CZ/wjdNn8Yti1KWy+ASv0/OmRKJ+AtbTQHcTe77LGb++Vvbdp/9JAG0BMNM6MfNvDS9OKjtWAWnSOq7c3S2G2SSy+mQ5oyOb3Y7vdd6TmXLTzZO2TbCGh9xU0HCMJVaeqYvv/HxvvXPrBxrcGeb4Bc9rEfWx/hK3DNHQlUahZWMUyVTfVR+u0VGE8GpUAQGoGFwr9k1u2tI4lo/ZAlZrZDYXMRWL6xiPCKuOwwGk7ju+RcIFcazTZ3wI8T9pZVjnwFJvoV0Tvt2C0JqPOsD3dCwFbXHQ8NNHIWo8AwtFgMwQeeBpkD/jhBtD2A/ZWJuQIf+YC7Ku2H8fKGPI8iC09d4c50ItvzL9y+bHqurn7l1/LhMFnrdM5HVnoH+VRBmy9P7dA35D3gZ1gpB9Xo3bX9WPh+z4nmbzzwbOt+0X0zHmc4eNI5fYaPbn+zYaCTubOqhnYTf/DT8i7FTHF0tXhi2MaAXjSuOXn9uJ+11q5xRVjyR5f7MvxzTumcV2j8XUoKQDIhRQN7dqp68MuGV+mr0iEOaHaARUBLp1SWKD/DPDW1AT2/eC7P+gzHiMlLKmHu3EuOUXTz4jRRKDDlz4Qu24yfIzuzH+DzwZ3mUGtG/Y8NJ0oA8z8+/lUn+8+4ETxd3jVxx/IB23Qt6+5+KJkQGiqOZrv71Bgzc0f5kbT6bQwHXrIbYU0LYZ+Rqvx9j/AxrPDp84nHl2Y+4CAgBb6mUzqnPuVX9fT2/f7mAOcC4o2RJXTIcJ3G5N/x4LugIyE52YLwwpqDDjT3G/6t2Uh4vgOPcBHwpfHm3/sMtVvVBb2RC+bkC+lKrH+YZDNK35rqu5c0Xg2mbUX7Tn6WPHngLXXAG1AXgAZeO3POKsSk8MN52UJ+xz5zY5tzL7lY6oeLTLE8P/UjfIkDVEJ96CYjK+sLSCLGDOYRFcPPYtL9qh5gG4b0Wje67hqAXrp8/OoBzqZ2tVUQv2JAAAAAElFTkSuQmCC";
 
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw8qoxuSt40ErQw3y_cIzGn__cvewjcqLZBKVitrMKt0nspxPYkYPEzNFSeH9nZoQIN/exec';
 
@@ -464,7 +464,9 @@ function buildCoordUsers(){
 
 /* Coordinadores con cuenta propia (nombre de persona en vez del nombre de la
    operación). El usuario se escribe igual que el nombre, en minúsculas y sin
-   espacios ni tildes: "Felipe Coordinadores" -> "felipecoordinadores". */
+   espacios ni tildes: "Felipe Coordinadores" -> "felipecoordinadores".
+   Si un usuario lleva puedeElegirOperacion:true, en el formulario de nueva
+   requisición puede escoger cualquier operación del catálogo. */
 const COORD_EXTRA = [
   {
     usuario:'felipecoordinadores',
@@ -516,6 +518,17 @@ const COORD_EXTRA = [
     rol:'coordinador',
     operacionCode:'TODAS',
     operacionNombre:'TODAS',
+  },
+  {
+    usuario:'jhonrobayo',
+    password:'jhonrobayo2026*',
+    nombre:'Jhon Robayo',
+    cargo:'Jefe de Operaciones',
+    correo:'jhon.robayo@inlotrans.com.co',
+    rol:'coordinador',
+    operacionCode:'TODAS',
+    operacionNombre:'TODAS',
+    puedeElegirOperacion:true,
   },
 ];
 
@@ -1068,8 +1081,16 @@ function renderNuevaRequisicion(){
         <div class="grid2">
           <div class="field">
             <label>Operación</label>
-            <div class="readonly-field">${state.user.operacionNombre || '—'}</div>
-            <div class="hint">Tu usuario está asociado a esta operación.</div>
+            ${state.user.puedeElegirOperacion ? `
+              <select id="f-operacion" required>
+                <option value="">Selecciona una operación…</option>
+                ${OPERACIONES.filter(o=>o.code!=='TODAS').map(o=>`<option value="${o.code}">${o.name}</option>`).join('')}
+              </select>
+              <div class="hint">Tu usuario puede solicitar personal para cualquier operación.</div>
+            ` : `
+              <div class="readonly-field">${state.user.operacionNombre || '—'}</div>
+              <div class="hint">Tu usuario está asociado a esta operación.</div>
+            `}
           </div>
           <div class="field">
             <label>Ciudad</label>
@@ -1421,9 +1442,15 @@ function attachMainEvents(){
       submitBtn.disabled = true;
       submitBtn.textContent = 'Enviando…';
 
+      /* Si el usuario puede elegir operación (ej. Jefe de Operaciones), se usa la
+         que escogió en el formulario; si no, la operación fija de su usuario. */
+      const opElegida = state.user.puedeElegirOperacion
+        ? OPERACIONES.find(o=>o.code===document.getElementById('f-operacion').value)
+        : null;
+
       const payload = {
-        operacionCode: state.user.operacionCode,
-        operacionNombre: state.user.operacionNombre,
+        operacionCode: opElegida ? opElegida.code : state.user.operacionCode,
+        operacionNombre: opElegida ? opElegida.name : state.user.operacionNombre,
         ciudad: document.getElementById('f-ciudad').value,
         cargo: state.user.rol==='seguridad' ? 'AUXILIAR DE PREVENCION DE PERDIDAS' : document.getElementById('f-cargo').value,
         vacantes: parseInt(document.getElementById('f-vacantes').value || '1'),
